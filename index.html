@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <style>
         :root {
@@ -45,14 +46,10 @@
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.4);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             height: 100vh;
@@ -61,20 +58,9 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
         .nav-bar {
             height: 56px;
@@ -83,82 +69,57 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
             box-shadow: var(--shadow-sm);
+            gap: 8px;
         }
 
         .nav-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 18px;
+            gap: 8px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--primary);
+            white-space: nowrap;
         }
-
-        .nav-brand i {
-            font-size: 22px;
-        }
+        .nav-brand i { font-size: 20px; }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 6px;
+            flex-wrap: nowrap;
         }
 
         .btn {
-            padding: 7px 14px;
+            padding: 7px 12px;
             border: none;
             border-radius: var(--radius-xs);
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             white-space: nowrap;
             font-family: inherit;
             background: var(--surface);
             color: var(--text);
             border: 1px solid var(--border);
         }
-
-        .btn:hover {
-            background: var(--surface-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-icon {
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 11px;
-        }
+        .btn:hover { background: var(--surface-hover); transform: translateY(-1px); }
+        .btn-primary { background: var(--primary); color: white; border: none; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-icon { width: 34px; height: 34px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .btn-sm { padding: 5px 10px; font-size: 11px; }
+        .btn-xs { padding: 3px 8px; font-size: 10px; }
 
         .main-container {
             display: flex;
@@ -167,7 +128,7 @@
         }
 
         .editor-panel {
-            width: 450px;
+            width: 420px;
             min-width: 300px;
             height: 100%;
             background: var(--surface);
@@ -176,44 +137,41 @@
             flex-direction: column;
             transition: width 0.3s;
             position: relative;
+            z-index: 100;
         }
 
         .resize-handle {
             position: absolute;
-            right: -4px;
+            right: -3px;
             top: 0;
             bottom: 0;
-            width: 8px;
+            width: 6px;
             cursor: col-resize;
             z-index: 10;
-            background: transparent;
         }
-
-        .resize-handle:hover {
-            background: var(--primary-light);
-            opacity: 0.3;
-        }
+        .resize-handle:hover, .resize-handle.active { background: var(--primary); opacity: 0.4; }
 
         .editor-header {
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .editor-tabs {
             display: flex;
             gap: 2px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             overflow-x: auto;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
         }
-
         .editor-tab {
-            padding: 5px 12px;
-            border-radius: 20px;
+            padding: 5px 10px;
+            border-radius: 16px;
             cursor: pointer;
             font-size: 11px;
             font-weight: 600;
@@ -223,50 +181,34 @@
             border: 1px solid transparent;
             transition: all 0.2s;
             font-family: inherit;
+            flex-shrink: 0;
         }
-
-        .editor-tab:hover {
-            background: var(--surface-hover);
-            color: var(--text);
-        }
-
-        .editor-tab.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .editor-tab:hover { background: var(--surface-hover); color: var(--text); }
+        .editor-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         .editor-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 14px;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .form-section {
-            display: none;
-        }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
 
-        .form-section.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
+        .form-group { margin-bottom: 12px; }
         .form-label {
             display: block;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .form-input, .form-textarea, .form-select {
             width: 100%;
-            padding: 9px 12px;
+            padding: 8px 10px;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-xs);
             font-size: 13px;
@@ -275,102 +217,72 @@
             transition: all 0.2s;
             font-family: inherit;
         }
-
         .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
         }
-
-        .form-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .form-textarea { min-height: 70px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
         .photo-upload-area {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border: 2px dashed var(--border);
-            border-radius: var(--radius);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             overflow: hidden;
-            margin: 0 auto 16px;
+            margin: 0 auto 14px;
             background: var(--bg);
             transition: all 0.2s;
+            position: relative;
         }
-
-        .photo-upload-area:hover {
-            border-color: var(--primary);
-        }
-
+        .photo-upload-area:hover { border-color: var(--primary); }
         .photo-upload-area img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-
-        .photo-upload-area .placeholder {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .photo-upload-area .placeholder i {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 4px;
-        }
+        .photo-upload-area .placeholder { text-align: center; color: var(--text-muted); font-size: 10px; z-index: 1; }
+        .photo-upload-area .placeholder i { font-size: 22px; display: block; margin-bottom: 2px; }
 
         .list-item {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 14px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
             position: relative;
         }
-
         .list-item-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-
-        .list-item-title {
-            font-weight: 700;
-            font-size: 12px;
-            color: var(--primary);
-        }
-
+        .list-item-title { font-weight: 700; font-size: 11px; color: var(--primary); }
+        .list-item-actions { display: flex; gap: 4px; }
         .list-item-actions button {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px 6px;
+            padding: 3px 5px;
             color: var(--text-muted);
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             transition: all 0.2s;
         }
-
-        .list-item-actions button:hover {
-            background: var(--surface-hover);
-            color: var(--danger);
-        }
+        .list-item-actions button:hover { background: var(--surface-hover); color: var(--danger); }
 
         .add-item-btn {
             width: 100%;
-            padding: 10px;
+            padding: 9px;
             background: transparent;
             border: 2px dashed var(--border);
             border-radius: var(--radius-sm);
@@ -380,12 +292,9 @@
             transition: all 0.2s;
             font-size: 12px;
             font-family: inherit;
+            margin-top: 4px;
         }
-
-        .add-item-btn:hover {
-            background: var(--surface-hover);
-            border-color: var(--primary);
-        }
+        .add-item-btn:hover { background: var(--surface-hover); border-color: var(--primary); }
 
         .preview-panel {
             flex: 1;
@@ -395,78 +304,144 @@
             flex-direction: column;
             overflow: hidden;
         }
-
-        .dark-mode .preview-panel {
-            background: #1a1a2e;
-        }
+        .dark-mode .preview-panel { background: #1a1a2e; }
 
         .preview-toolbar {
-            padding: 10px 16px;
+            padding: 8px 14px;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .zoom-controls {
-            display: flex;
-            align-items: center;
             gap: 6px;
+            flex-shrink: 0;
         }
-
-        .zoom-level {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            min-width: 45px;
-            text-align: center;
-        }
-
         .preview-container {
             flex: 1;
             overflow: auto;
             display: flex;
             align-items: flex-start;
             justify-content: center;
-            padding: 24px;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .resume-page {
             width: 210mm;
-            min-height: 297mm;
             background: white;
             box-shadow: 0 8px 30px rgba(0,0,0,0.15);
             transition: transform 0.2s;
             transform-origin: top center;
             overflow: hidden;
+            page-break-after: always;
         }
+        .resume-page * { color: #1a1a1a !important; max-width: 100%; word-wrap: break-word; }
 
-        .resume-page * {
-            color: #1a1a1a !important;
-            max-width: 100%;
-            word-wrap: break-word;
-        }
-
-        #resumeContent {
+        .resume-content {
             padding: 20mm 18mm;
             font-family: 'Calibri', 'Segoe UI', sans-serif;
             font-size: 12px;
             line-height: 1.6;
         }
 
+        /* RTE Toolbar */
+        .rte-toolbar {
+            display: none;
+            position: absolute;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            gap: 3px;
+            flex-wrap: wrap;
+            max-width: 350px;
+        }
+        .rte-toolbar.show { display: flex; }
+        .rte-btn {
+            padding: 5px 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text);
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .rte-btn:hover { background: var(--surface-hover); }
+        .rte-select { padding: 4px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; background: var(--bg); color: var(--text); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal h3 { margin-bottom: 16px; font-size: 18px; }
+        .modal-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: var(--text); box-shadow: 0 0 0 2px var(--primary); }
+
+        .style-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
         .toast-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 3000;
+            z-index: 4000;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         .toast {
             padding: 12px 18px;
             background: var(--surface);
@@ -479,159 +454,32 @@
             font-size: 13px;
             font-weight: 500;
             animation: slideIn 0.3s ease;
-            min-width: 250px;
         }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        .toast.success {
-            border-left: 4px solid var(--success);
-        }
-        .toast.error {
-            border-left: 4px solid var(--danger);
-        }
-        .toast.info {
-            border-left: 4px solid var(--primary);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 24px;
-            max-width: 450px;
-            width: 90%;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal h3 {
-            margin-bottom: 16px;
-            font-size: 18px;
-        }
-
-        .theme-colors-mini {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .color-dot {
-            width: 24px;
-            height: 24px;
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
             border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            animation: spin 0.6s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .color-dot:hover {
-            transform: scale(1.15);
-        }
-        .color-dot.active {
-            border-color: var(--text);
-            box-shadow: 0 0 0 2px var(--primary);
-        }
-
-        @media (max-width: 1024px) {
-            .editor-panel {
-                position: fixed;
-                left: 0;
-                top: 56px;
-                bottom: 0;
-                z-index: 500;
-                transform: translateX(-100%);
-                width: 100%;
-                max-width: 380px;
-                min-width: auto;
-                transition: transform 0.3s;
-            }
-            .editor-panel.mobile-open {
-                transform: translateX(0);
-            }
-            .mobile-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.5);
-                z-index: 499;
-                top: 56px;
-            }
-            .mobile-overlay.show {
-                display: block;
-            }
-            .preview-panel {
-                width: 100%;
-            }
-            .preview-container {
-                padding: 8px;
-            }
-            .resume-page {
-                width: 100% !important;
-                min-height: auto;
-            }
-            #resumeContent {
-                padding: 12mm 8mm;
-            }
-            .resize-handle {
-                display: none;
-            }
-            .nav-actions .btn span {
-                display: none;
-            }
-            .mobile-edit-btn {
-                display: flex !important;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .nav-brand span {
-                display: none;
-            }
-            .editor-tabs {
-                gap: 1px;
-                padding: 6px 8px;
-            }
-            .editor-tab {
-                padding: 4px 8px;
-                font-size: 10px;
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .preview-toolbar {
-                padding: 6px 10px;
-            }
-            .preview-toolbar select {
-                font-size: 11px;
-                padding: 4px 8px;
-            }
-        }
-
+        /* Mobile */
         .mobile-edit-btn {
             display: none;
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             background: var(--primary);
             color: white;
             border: none;
@@ -643,9 +491,54 @@
             align-items: center;
             justify-content: center;
         }
+
+        @media (max-width: 1024px) {
+            .editor-panel {
+                position: fixed;
+                left: 0;
+                top: 56px;
+                bottom: 0;
+                z-index: 500;
+                transform: translateX(-100%);
+                width: 100%;
+                max-width: 360px;
+                transition: transform 0.3s;
+            }
+            .editor-panel.mobile-open { transform: translateX(0); }
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 499;
+                top: 56px;
+            }
+            .mobile-overlay.show { display: block; }
+            .preview-panel { width: 100%; }
+            .preview-container { padding: 8px; }
+            .resume-page { width: 100% !important; }
+            .resume-content { padding: 10mm 6mm; }
+            .resize-handle { display: none; }
+            .mobile-edit-btn { display: flex; }
+            .nav-bar { padding: 0 8px; }
+        }
+
+        @media (max-width: 640px) {
+            .nav-brand span { font-size: 13px; }
+            .nav-actions .btn span { display: none; }
+            .nav-actions { gap: 2px; }
+            .btn { padding: 6px 8px; }
+            .btn-icon { width: 30px; height: 30px; }
+            .editor-tabs { padding: 6px; gap: 1px; }
+            .editor-tab { padding: 4px 7px; font-size: 10px; }
+            .form-row { grid-template-columns: 1fr; }
+            .preview-toolbar { padding: 6px 8px; gap: 4px; }
+            .color-grid { grid-template-columns: repeat(4, 1fr); }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="nav-bar">
         <div class="nav-brand">
             <i class="fas fa-file-alt"></i>
@@ -654,29 +547,23 @@
         <div class="nav-actions">
             <button class="btn btn-icon" onclick="undoAction()" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
             <button class="btn btn-icon" onclick="redoAction()" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
-            <button class="btn btn-sm" onclick="importCV()"><i class="fas fa-upload"></i> <span>Import</span></button>
+            <button class="btn btn-sm" onclick="importCV()"><i class="fas fa-upload"></i><span>Import</span></button>
             <input type="file" id="cvImport" style="display:none" accept=".pdf,.docx,.txt" onchange="handleCVImport(event)">
-            
-            <div class="theme-colors-mini" title="Resume Theme Color">
-                <div class="color-dot active" style="background:#6366f1;" onclick="setResumeTheme('#6366f1')"></div>
-                <div class="color-dot" style="background:#3b82f6;" onclick="setResumeTheme('#3b82f6')"></div>
-                <div class="color-dot" style="background:#10b981;" onclick="setResumeTheme('#10b981')"></div>
-                <div class="color-dot" style="background:#f59e0b;" onclick="setResumeTheme('#f59e0b')"></div>
-                <div class="color-dot" style="background:#ef4444;" onclick="setResumeTheme('#ef4444')"></div>
-                <div class="color-dot" style="background:#8b5cf6;" onclick="setResumeTheme('#8b5cf6')"></div>
-            </div>
-            
-            <button class="btn btn-icon" onclick="toggleDarkMode()" title="Dark/Light UI Mode"><i class="fas fa-moon" id="darkIcon"></i></button>
-            <button class="btn btn-primary" onclick="showDownloadModal()"><i class="fas fa-download"></i> <span>Download</span></button>
+            <button class="btn btn-sm" onclick="showThemeModal()"><i class="fas fa-palette"></i><span>Theme</span></button>
+            <button class="btn btn-sm" onclick="showStyleModal()"><i class="fas fa-font"></i><span>Style</span></button>
+            <button class="btn btn-icon" onclick="toggleDarkMode()"><i class="fas fa-moon" id="darkIcon"></i></button>
+            <button class="btn btn-primary btn-sm" onclick="showDownloadModal()"><i class="fas fa-download"></i><span>Download</span></button>
         </div>
     </nav>
 
+    <!-- Main Container -->
     <div class="main-container">
+        <!-- Editor Panel -->
         <div class="editor-panel" id="editorPanel">
             <div class="resize-handle" id="resizeHandle"></div>
             <div class="editor-header">
-                <h3 style="font-size:14px;font-weight:700;">Resume Editor</h3>
-                <button class="btn btn-icon btn-sm" onclick="toggleEditorMobile()"><i class="fas fa-times"></i></button>
+                <h3 style="font-size:13px;font-weight:700;">Resume Editor</h3>
+                <button class="btn btn-icon btn-xs" onclick="toggleEditorMobile()" style="display:none;" id="closeEditorBtn"><i class="fas fa-times"></i></button>
             </div>
             <div class="editor-tabs" id="editorTabs">
                 <button class="editor-tab active" data-section="personal">Personal</button>
@@ -690,13 +577,11 @@
                 <button class="editor-tab" data-section="custom">Custom</button>
             </div>
             <div class="editor-content" id="editorContent">
+                <!-- Personal Section -->
                 <div class="form-section active" id="section-personal">
                     <div class="photo-upload-area" onclick="document.getElementById('photoUpload').click()">
                         <img id="photoPreview" src="" style="display:none;">
-                        <div class="placeholder" id="photoPlaceholder">
-                            <i class="fas fa-camera"></i>
-                            <span>Photo</span>
-                        </div>
+                        <div class="placeholder" id="photoPlaceholder"><i class="fas fa-camera"></i><span>Photo</span></div>
                     </div>
                     <input type="file" id="photoUpload" accept=".png,.jpg,.jpeg,.webp" style="display:none" onchange="handlePhotoUpload(event)">
                     <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="fullName" placeholder="John Doe" oninput="updateField('personal.fullName', this.value)"></div>
@@ -712,19 +597,20 @@
                     <div class="form-group"><label class="form-label">GitHub</label><input type="url" class="form-input" id="github" placeholder="https://github.com/username" oninput="updateField('personal.github', this.value)"></div>
                     <div class="form-group"><label class="form-label">Portfolio</label><input type="url" class="form-input" id="portfolio" placeholder="https://yourwebsite.com" oninput="updateField('personal.portfolio', this.value)"></div>
                 </div>
+                <!-- Other Sections -->
                 <div class="form-section" id="section-summary">
-                    <div class="form-group"><label class="form-label">Career Objective</label><textarea class="form-textarea" id="careerObjective" placeholder="Write a compelling professional summary..." oninput="updateField('summary.careerObjective', this.value)"></textarea></div>
+                    <div class="form-group"><label class="form-label">Career Objective</label><textarea class="form-textarea rte-enabled" id="careerObjective" placeholder="Write a compelling professional summary..." oninput="updateField('summary.careerObjective', this.value)"></textarea></div>
                     <div class="form-group"><label class="form-label">Years of Experience</label><input type="text" class="form-input" id="totalExp" placeholder="5+ years" oninput="updateField('summary.totalExp', this.value)"></div>
-                    <div class="form-group"><label class="form-label">Key Technical Skills</label><textarea class="form-textarea" id="keyTechSkills" placeholder="JavaScript, Python, React, Node.js..." oninput="updateField('summary.keyTechSkills', this.value)"></textarea></div>
+                    <div class="form-group"><label class="form-label">Key Technical Skills</label><textarea class="form-textarea rte-enabled" id="keyTechSkills" placeholder="JavaScript, Python, React, Node.js..." oninput="updateField('summary.keyTechSkills', this.value)"></textarea></div>
                 </div>
                 <div class="form-section" id="section-experience"><div id="experienceList"></div><button class="add-item-btn" onclick="addExperience()"><i class="fas fa-plus"></i> Add Work Experience</button></div>
                 <div class="form-section" id="section-education"><div id="educationList"></div><button class="add-item-btn" onclick="addEducation()"><i class="fas fa-plus"></i> Add Education</button></div>
                 <div class="form-section" id="section-skills">
-                    <div class="form-group"><label class="form-label">Programming Languages</label><textarea class="form-textarea" id="progLanguages" placeholder="Python, Java, JavaScript, C++..." oninput="updateSkills()"></textarea></div>
-                    <div class="form-group"><label class="form-label">Frameworks & Libraries</label><textarea class="form-textarea" id="frameworks" placeholder="React, Django, Node.js..." oninput="updateSkills()"></textarea></div>
-                    <div class="form-group"><label class="form-label">Tools & Technologies</label><textarea class="form-textarea" id="tools" placeholder="Git, Docker, AWS..." oninput="updateSkills()"></textarea></div>
-                    <div class="form-group"><label class="form-label">Databases</label><textarea class="form-textarea" id="databases" placeholder="MySQL, PostgreSQL, MongoDB..." oninput="updateSkills()"></textarea></div>
-                    <div class="form-group"><label class="form-label">Soft Skills</label><textarea class="form-textarea" id="softSkills" placeholder="Leadership, Communication..." oninput="updateSkills()"></textarea></div>
+                    <div class="form-group"><label class="form-label">Programming Languages</label><textarea class="form-textarea rte-enabled" id="progLanguages" placeholder="Python, Java, JavaScript, C++..." oninput="updateSkills()"></textarea></div>
+                    <div class="form-group"><label class="form-label">Frameworks & Libraries</label><textarea class="form-textarea rte-enabled" id="frameworks" placeholder="React, Django, Node.js..." oninput="updateSkills()"></textarea></div>
+                    <div class="form-group"><label class="form-label">Tools & Technologies</label><textarea class="form-textarea rte-enabled" id="tools" placeholder="Git, Docker, AWS..." oninput="updateSkills()"></textarea></div>
+                    <div class="form-group"><label class="form-label">Databases</label><textarea class="form-textarea rte-enabled" id="databases" placeholder="MySQL, PostgreSQL, MongoDB..." oninput="updateSkills()"></textarea></div>
+                    <div class="form-group"><label class="form-label">Soft Skills</label><textarea class="form-textarea rte-enabled" id="softSkills" placeholder="Leadership, Communication..." oninput="updateSkills()"></textarea></div>
                 </div>
                 <div class="form-section" id="section-projects"><div id="projectsList"></div><button class="add-item-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button></div>
                 <div class="form-section" id="section-certifications"><div id="certificationsList"></div><button class="add-item-btn" onclick="addCertification()"><i class="fas fa-plus"></i> Add Certification</button></div>
@@ -735,11 +621,12 @@
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleEditorMobile()"></div>
 
+        <!-- Preview Panel -->
         <div class="preview-panel">
             <div class="preview-toolbar">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-weight:700;font-size:13px;">Live Preview</span>
-                    <select class="form-select" style="width:auto;padding:5px 10px;font-size:11px;" onchange="changeTemplate(this.value)" id="templateSelect">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="font-weight:700;font-size:12px;">Preview</span>
+                    <select class="form-select" style="width:auto;padding:4px 8px;font-size:11px;" onchange="changeTemplate(this.value)" id="templateSelect">
                         <option value="modern">Modern</option>
                         <option value="minimal">Minimal</option>
                         <option value="creative">Creative</option>
@@ -747,46 +634,143 @@
                         <option value="executive">Executive</option>
                     </select>
                 </div>
-                <div class="zoom-controls">
-                    <button class="btn btn-sm btn-icon" onclick="zoomPreview(-10)"><i class="fas fa-search-minus"></i></button>
-                    <span class="zoom-level" id="zoomLevel">100%</span>
-                    <button class="btn btn-sm btn-icon" onclick="zoomPreview(10)"><i class="fas fa-search-plus"></i></button>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <button class="btn btn-xs btn-icon" onclick="zoomPreview(-10)"><i class="fas fa-search-minus"></i></button>
+                    <span style="font-size:11px;min-width:40px;text-align:center;" id="zoomLevel">100%</span>
+                    <button class="btn btn-xs btn-icon" onclick="zoomPreview(10)"><i class="fas fa-search-plus"></i></button>
                 </div>
             </div>
             <div class="preview-container" id="previewContainer">
-                <div class="resume-page" id="resumePage">
-                    <div id="resumeContent"></div>
-                </div>
+                <div id="resumePages"></div>
             </div>
         </div>
     </div>
 
-    <button class="mobile-edit-btn" onclick="toggleEditorMobile()"><i class="fas fa-edit"></i></button>
+    <button class="mobile-edit-btn" id="mobileEditBtn" onclick="toggleEditorMobile()"><i class="fas fa-edit"></i></button>
 
-    <div class="modal-overlay" id="downloadModal" style="display:none;" onclick="if(event.target===this)closeDownloadModal()">
+    <!-- Download Modal -->
+    <div class="modal-overlay" id="downloadModal" style="display:none;">
         <div class="modal">
+            <button class="modal-close" onclick="closeDownloadModal()">&times;</button>
             <h3>Download Resume</h3>
-            <p style="color:var(--text-secondary);margin-bottom:16px;">Choose format:</p>
+            <p style="color:var(--text-secondary);margin-bottom:14px;font-size:13px;">Choose format:</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <button class="btn btn-primary" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
                 <button class="btn" onclick="downloadPNG()"><i class="fas fa-file-image"></i> PNG</button>
                 <button class="btn" onclick="downloadJPEG()"><i class="fas fa-file-image"></i> JPEG</button>
                 <button class="btn" onclick="downloadTXT()"><i class="fas fa-file-alt"></i> TXT</button>
-                <button class="btn" onclick="closeDownloadModal()" style="grid-column:1/-1;"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
+    </div>
+
+    <!-- Theme Modal -->
+    <div class="modal-overlay" id="themeModal" style="display:none;">
+        <div class="modal">
+            <button class="modal-close" onclick="closeThemeModal()">&times;</button>
+            <h3>Resume Theme Color</h3>
+            <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Select accent color for headings and borders:</p>
+            <div class="color-grid" id="themeColorGrid"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Current: <span id="currentThemeColor" style="font-weight:700;"></span></p>
+        </div>
+    </div>
+
+    <!-- Style Modal -->
+    <div class="modal-overlay" id="styleModal" style="display:none;">
+        <div class="modal">
+            <button class="modal-close" onclick="closeStyleModal()">&times;</button>
+            <h3>Resume Style Settings</h3>
+            <div class="style-controls">
+                <div class="form-group">
+                    <label class="form-label">Font Family</label>
+                    <select class="form-select" id="styleFontFamily" onchange="updateStyle('fontFamily', this.value)">
+                        <option value="Calibri, sans-serif">Calibri</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                        <option value="Garamond, serif">Garamond</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Body Font Size</label>
+                    <select class="form-select" id="styleFontSize" onchange="updateStyle('fontSize', this.value)">
+                        <option value="10">10px</option>
+                        <option value="11">11px</option>
+                        <option value="12" selected>12px</option>
+                        <option value="13">13px</option>
+                        <option value="14">14px</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Heading Size</label>
+                    <select class="form-select" id="styleHeadingSize" onchange="updateStyle('headingSize', this.value)">
+                        <option value="14">14px</option>
+                        <option value="16" selected>16px</option>
+                        <option value="18">18px</option>
+                        <option value="20">20px</option>
+                        <option value="22">22px</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bullet Style</label>
+                    <select class="form-select" id="styleBullet" onchange="updateStyle('bulletStyle', this.value)">
+                        <option value="disc">• Circle</option>
+                        <option value="square">▪ Square</option>
+                        <option value="dash">— Dash</option>
+                        <option value="arrow">→ Arrow</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RTE Toolbar -->
+    <div class="rte-toolbar" id="rteToolbar">
+        <select class="rte-select" onchange="execRTE('fontName', this.value)">
+            <option value="Calibri">Calibri</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Courier New">Courier New</option>
+        </select>
+        <select class="rte-select" onchange="execRTE('fontSize', this.value)">
+            <option value="1">Small</option>
+            <option value="3" selected>Normal</option>
+            <option value="5">Large</option>
+            <option value="7">XL</option>
+        </select>
+        <button class="rte-btn" onclick="execRTE('bold')"><i class="fas fa-bold"></i></button>
+        <button class="rte-btn" onclick="execRTE('italic')"><i class="fas fa-italic"></i></button>
+        <button class="rte-btn" onclick="execRTE('underline')"><i class="fas fa-underline"></i></button>
+        <button class="rte-btn" onclick="execRTE('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+        <button class="rte-btn" onclick="execRTE('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+        <button class="rte-btn" onclick="execRTE('justifyLeft')"><i class="fas fa-align-left"></i></button>
+        <button class="rte-btn" onclick="execRTE('justifyCenter')"><i class="fas fa-align-center"></i></button>
+        <button class="rte-btn" onclick="execRTE('justifyRight')"><i class="fas fa-align-right"></i></button>
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // ============ INITIALIZATION ============
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // Core State
+        const GEMINI_API_KEY = 'AIzaSyDZo6Qm2OG1Q4JFCzXGzGHFJfXvQz3Vq6c';
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+
         const DEFAULT_DATA = {
             photo: '',
             template: 'modern',
             resumeTheme: '#6366f1',
+            style: {
+                fontFamily: 'Calibri, sans-serif',
+                fontSize: '12',
+                headingSize: '16',
+                bulletStyle: 'disc'
+            },
             personal: { fullName: '', dob: '', email: '', phone: '', altPhone: '', city: '', linkedin: '', github: '', portfolio: '' },
             summary: { currentTitle: '', careerObjective: '', totalExp: '', keyTechSkills: '' },
             experience: [],
@@ -804,24 +788,24 @@
         let currentZoom = 100;
         const MAX_UNDO = 100;
 
-        // ============ INITIALIZATION ============
         function init() {
             loadSavedData();
             setupTabs();
             setupResize();
             setupKeyboardShortcuts();
+            setupRTE();
             renderAllLists();
             updatePreview();
+            buildThemeColorGrid();
             
             if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('darkIcon').className = 'fas fa-sun';
             }
-            
-            const savedTheme = localStorage.getItem('resumeTheme');
-            if (savedTheme) {
-                resumeData.resumeTheme = savedTheme;
-                updateThemeDots();
+
+            // Show close button on mobile
+            if (window.innerWidth <= 1024) {
+                document.getElementById('closeEditorBtn').style.display = 'flex';
             }
         }
 
@@ -830,28 +814,32 @@
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    // Merge with defaults to handle new fields
-                    resumeData = {
-                        ...JSON.parse(JSON.stringify(DEFAULT_DATA)),
-                        ...parsed,
-                        personal: { ...DEFAULT_DATA.personal, ...(parsed.personal || {}) },
-                        summary: { ...DEFAULT_DATA.summary, ...(parsed.summary || {}) },
-                        skills: { ...DEFAULT_DATA.skills, ...(parsed.skills || {}) }
-                    };
+                    resumeData = deepMerge(JSON.parse(JSON.stringify(DEFAULT_DATA)), parsed);
                     populateAllFields();
                     updatePreview();
                 } catch (e) {
                     console.error('Load error:', e);
-                    resumeData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 }
             }
+        }
+
+        function deepMerge(target, source) {
+            const output = { ...target };
+            for (const key in source) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) && target[key]) {
+                    output[key] = deepMerge(target[key], source[key]);
+                } else {
+                    output[key] = source[key];
+                }
+            }
+            return output;
         }
 
         function saveToLocalStorage() {
             try {
                 localStorage.setItem('resumeData', JSON.stringify(resumeData));
             } catch (e) {
-                showToast('Storage full. Please clear some data.', 'error');
+                showToast('Storage full. Clear some data.', 'error');
             }
         }
 
@@ -859,36 +847,29 @@
         function pushState() {
             undoStack.push(JSON.parse(JSON.stringify(resumeData)));
             if (undoStack.length > MAX_UNDO) undoStack.shift();
-            redoStack = []; // Clear redo on new action
+            redoStack = [];
         }
 
         function undoAction() {
-            if (undoStack.length === 0) {
-                showToast('Nothing to undo', 'info');
-                return;
-            }
+            if (undoStack.length === 0) { showToast('Nothing to undo', 'info'); return; }
             redoStack.push(JSON.parse(JSON.stringify(resumeData)));
             resumeData = undoStack.pop();
             populateAllFields();
             updatePreview();
             saveToLocalStorage();
-            showToast('Undo', 'info');
+            showToast('Undone', 'info');
         }
 
         function redoAction() {
-            if (redoStack.length === 0) {
-                showToast('Nothing to redo', 'info');
-                return;
-            }
+            if (redoStack.length === 0) { showToast('Nothing to redo', 'info'); return; }
             undoStack.push(JSON.parse(JSON.stringify(resumeData)));
             resumeData = redoStack.pop();
             populateAllFields();
             updatePreview();
             saveToLocalStorage();
-            showToast('Redo', 'info');
+            showToast('Redone', 'info');
         }
 
-        // ============ KEYBOARD SHORTCUTS ============
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
@@ -929,24 +910,13 @@
 
         function populateAllFields() {
             const fieldMap = {
-                'fullName': 'personal.fullName',
-                'currentTitle': 'summary.currentTitle',
-                'dob': 'personal.dob',
-                'email': 'personal.email',
-                'phone': 'personal.phone',
-                'altPhone': 'personal.altPhone',
-                'city': 'personal.city',
-                'linkedin': 'personal.linkedin',
-                'github': 'personal.github',
-                'portfolio': 'personal.portfolio',
-                'careerObjective': 'summary.careerObjective',
-                'totalExp': 'summary.totalExp',
-                'keyTechSkills': 'summary.keyTechSkills',
-                'progLanguages': 'skills.languages',
-                'frameworks': 'skills.frameworks',
-                'tools': 'skills.tools',
-                'databases': 'skills.databases',
-                'softSkills': 'skills.softSkills'
+                'fullName': 'personal.fullName', 'currentTitle': 'summary.currentTitle', 'dob': 'personal.dob',
+                'email': 'personal.email', 'phone': 'personal.phone', 'altPhone': 'personal.altPhone',
+                'city': 'personal.city', 'linkedin': 'personal.linkedin', 'github': 'personal.github',
+                'portfolio': 'personal.portfolio', 'careerObjective': 'summary.careerObjective',
+                'totalExp': 'summary.totalExp', 'keyTechSkills': 'summary.keyTechSkills',
+                'progLanguages': 'skills.languages', 'frameworks': 'skills.frameworks',
+                'tools': 'skills.tools', 'databases': 'skills.databases', 'softSkills': 'skills.softSkills'
             };
 
             Object.entries(fieldMap).forEach(([id, path]) => {
@@ -954,39 +924,41 @@
                 if (!el) return;
                 const keys = path.split('.');
                 let val = resumeData;
-                for (const k of keys) {
-                    val = val?.[k];
-                }
+                for (const k of keys) val = val?.[k];
                 el.value = val || '';
             });
 
             // Photo
-            const photoPreview = document.getElementById('photoPreview');
-            const photoPlaceholder = document.getElementById('photoPlaceholder');
+            const pp = document.getElementById('photoPreview');
+            const ph = document.getElementById('photoPlaceholder');
             if (resumeData.photo) {
-                photoPreview.src = resumeData.photo;
-                photoPreview.style.display = 'block';
-                photoPlaceholder.style.display = 'none';
+                pp.src = resumeData.photo;
+                pp.style.display = 'block';
+                ph.style.display = 'none';
             } else {
-                photoPreview.style.display = 'none';
-                photoPlaceholder.style.display = '';
+                pp.style.display = 'none';
+                ph.style.display = '';
             }
 
-            // Template select
-            const templateSelect = document.getElementById('templateSelect');
-            if (templateSelect) templateSelect.value = resumeData.template;
+            // Template
+            const ts = document.getElementById('templateSelect');
+            if (ts) ts.value = resumeData.template;
 
-            // Theme dots
-            updateThemeDots();
+            // Style
+            if (resumeData.style) {
+                const sf = document.getElementById('styleFontFamily');
+                const sfs = document.getElementById('styleFontSize');
+                const shs = document.getElementById('styleHeadingSize');
+                const sb = document.getElementById('styleBullet');
+                if (sf) sf.value = resumeData.style.fontFamily || 'Calibri, sans-serif';
+                if (sfs) sfs.value = resumeData.style.fontSize || '12';
+                if (shs) shs.value = resumeData.style.headingSize || '16';
+                if (sb) sb.value = resumeData.style.bulletStyle || 'disc';
+            }
 
+            document.getElementById('currentThemeColor').textContent = resumeData.resumeTheme;
+            updateThemeColorActive();
             renderAllLists();
-        }
-
-        function updateThemeDots() {
-            document.querySelectorAll('.color-dot').forEach(dot => {
-                dot.classList.toggle('active', dot.style.backgroundColor === resumeData.resumeTheme || 
-                    (dot.style.backgroundColor === 'rgb(99, 102, 241)' && resumeData.resumeTheme === '#6366f1'));
-            });
         }
 
         // ============ TABS ============
@@ -995,33 +967,31 @@
                 tab.addEventListener('click', function() {
                     document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
-                    const sectionId = 'section-' + this.dataset.section;
                     document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-                    const section = document.getElementById(sectionId);
+                    const section = document.getElementById('section-' + this.dataset.section);
                     if (section) section.classList.add('active');
                 });
             });
         }
 
-        // ============ RESIZE HANDLE ============
+        // ============ RESIZE ============
         function setupResize() {
             const handle = document.getElementById('resizeHandle');
             const panel = document.getElementById('editorPanel');
-            let isResizing = false;
-            let startX, startWidth;
+            let isResizing = false, startX, startWidth;
 
             handle.addEventListener('mousedown', (e) => {
                 isResizing = true;
                 startX = e.clientX;
                 startWidth = panel.offsetWidth;
+                handle.classList.add('active');
                 document.body.style.cursor = 'col-resize';
                 document.body.style.userSelect = 'none';
             });
 
             document.addEventListener('mousemove', (e) => {
                 if (!isResizing) return;
-                const diff = e.clientX - startX;
-                const newWidth = Math.max(300, Math.min(800, startWidth + diff));
+                const newWidth = Math.max(280, Math.min(700, startWidth + (e.clientX - startX)));
                 panel.style.width = newWidth + 'px';
                 panel.style.minWidth = newWidth + 'px';
             });
@@ -1029,10 +999,42 @@
             document.addEventListener('mouseup', () => {
                 if (isResizing) {
                     isResizing = false;
+                    handle.classList.remove('active');
                     document.body.style.cursor = '';
                     document.body.style.userSelect = '';
                 }
             });
+        }
+
+        // ============ RTE ============
+        let activeRTE = null;
+
+        function setupRTE() {
+            document.addEventListener('focusin', (e) => {
+                if (e.target.classList.contains('rte-enabled') || e.target.closest('.rte-enabled')) {
+                    activeRTE = e.target;
+                    const toolbar = document.getElementById('rteToolbar');
+                    const rect = e.target.getBoundingClientRect();
+                    toolbar.style.top = (rect.top - 50) + 'px';
+                    toolbar.style.left = Math.min(rect.left, window.innerWidth - 360) + 'px';
+                    toolbar.classList.add('show');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.rte-enabled') && !e.target.closest('#rteToolbar')) {
+                    document.getElementById('rteToolbar').classList.remove('show');
+                    activeRTE = null;
+                }
+            });
+        }
+
+        function execRTE(command, value = null) {
+            if (activeRTE) {
+                activeRTE.focus();
+                document.execCommand(command, false, value);
+                activeRTE.dispatchEvent(new Event('input', { bubbles: true }));
+            }
         }
 
         // ============ PHOTO UPLOAD ============
@@ -1040,7 +1042,7 @@
             const file = event.target.files?.[0];
             if (!file) return;
             if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-                showToast('Please upload PNG, JPG, or WebP', 'error');
+                showToast('Please use PNG, JPG, or WebP', 'error');
                 return;
             }
 
@@ -1048,20 +1050,20 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
+                    // Create a square crop from center
+                    const size = Math.min(img.width, img.height);
+                    const sx = (img.width - size) / 2;
+                    const sy = (img.height - size) / 2;
                     const canvas = document.createElement('canvas');
-                    const maxSize = 200;
-                    let w = img.width, h = img.height;
-                    if (w > h) { if (w > maxSize) { h *= maxSize/w; w = maxSize; } }
-                    else { if (h > maxSize) { w *= maxSize/h; h = maxSize; } }
-                    canvas.width = w;
-                    canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.width = 200;
+                    canvas.height = 200;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
                     
                     pushState();
-                    resumeData.photo = canvas.toDataURL('image/jpeg', 0.85);
-                    const preview = document.getElementById('photoPreview');
-                    preview.src = resumeData.photo;
-                    preview.style.display = 'block';
+                    resumeData.photo = canvas.toDataURL('image/jpeg', 0.9);
+                    document.getElementById('photoPreview').src = resumeData.photo;
+                    document.getElementById('photoPreview').style.display = 'block';
                     document.getElementById('photoPlaceholder').style.display = 'none';
                     updatePreview();
                     saveToLocalStorage();
@@ -1088,12 +1090,26 @@
         }
         function updateExpField(id, field, value) {
             const exp = resumeData.experience.find(e => e.id === id);
-            if (exp) {
-                pushState();
-                exp[field] = value;
-                updatePreview();
-                saveToLocalStorage();
-            }
+            if (exp) { pushState(); exp[field] = value; updatePreview(); saveToLocalStorage(); }
+        }
+        function renderExperienceList() {
+            const c = document.getElementById('experienceList');
+            if (!c) return;
+            c.innerHTML = resumeData.experience.map((e, i) => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">Experience #${i+1}</span>
+                        <div class="list-item-actions"><button onclick="removeExperience(${e.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Company</label><input class="form-input" value="${escHtml(e.company)}" onchange="updateExpField(${e.id},'company',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${escHtml(e.title)}" onchange="updateExpField(${e.id},'title',this.value)"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Start</label><input class="form-input" value="${escHtml(e.startDate)}" placeholder="MM/YYYY" onchange="updateExpField(${e.id},'startDate',this.value)"></div>
+                        <div class="form-group"><label class="form-label">End</label><input class="form-input" value="${escHtml(e.endDate)}" placeholder="Present" onchange="updateExpField(${e.id},'endDate',this.value)"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea rte-enabled" rows="2" onchange="updateExpField(${e.id},'description',this.value)">${escHtml(e.description)}</textarea></div>
+                </div>
+            `).join('');
         }
 
         function addEducation() {
@@ -1111,12 +1127,23 @@
         }
         function updateEduField(id, field, value) {
             const edu = resumeData.education.find(e => e.id === id);
-            if (edu) {
-                pushState();
-                edu[field] = value;
-                updatePreview();
-                saveToLocalStorage();
-            }
+            if (edu) { pushState(); edu[field] = value; updatePreview(); saveToLocalStorage(); }
+        }
+        function renderEducationList() {
+            const c = document.getElementById('educationList');
+            if (!c) return;
+            c.innerHTML = resumeData.education.map((e, i) => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">Education #${i+1}</span>
+                        <div class="list-item-actions"><button onclick="removeEducation(${e.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">School</label><input class="form-input" value="${escHtml(e.school)}" onchange="updateEduField(${e.id},'school',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Degree</label><input class="form-input" value="${escHtml(e.degree)}" onchange="updateEduField(${e.id},'degree',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Field</label><input class="form-input" value="${escHtml(e.field)}" onchange="updateEduField(${e.id},'field',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Year</label><input class="form-input" value="${escHtml(e.graduationYear)}" onchange="updateEduField(${e.id},'graduationYear',this.value)"></div>
+                </div>
+            `).join('');
         }
 
         function addProject() {
@@ -1133,13 +1160,23 @@
             saveToLocalStorage();
         }
         function updateProjField(id, field, value) {
-            const proj = resumeData.projects.find(p => p.id === id);
-            if (proj) {
-                pushState();
-                proj[field] = value;
-                updatePreview();
-                saveToLocalStorage();
-            }
+            const p = resumeData.projects.find(pr => pr.id === id);
+            if (p) { pushState(); p[field] = value; updatePreview(); saveToLocalStorage(); }
+        }
+        function renderProjectsList() {
+            const c = document.getElementById('projectsList');
+            if (!c) return;
+            c.innerHTML = resumeData.projects.map((p, i) => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">Project #${i+1}</span>
+                        <div class="list-item-actions"><button onclick="removeProject(${p.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Name</label><input class="form-input" value="${escHtml(p.name)}" onchange="updateProjField(${p.id},'name',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea rte-enabled" rows="2" onchange="updateProjField(${p.id},'description',this.value)">${escHtml(p.description)}</textarea></div>
+                    <div class="form-group"><label class="form-label">Technologies</label><input class="form-input" value="${escHtml(p.technologies)}" onchange="updateProjField(${p.id},'technologies',this.value)"></div>
+                </div>
+            `).join('');
         }
 
         function addCertification() {
@@ -1157,12 +1194,22 @@
         }
         function updateCertField(id, field, value) {
             const cert = resumeData.certifications.find(c => c.id === id);
-            if (cert) {
-                pushState();
-                cert[field] = value;
-                updatePreview();
-                saveToLocalStorage();
-            }
+            if (cert) { pushState(); cert[field] = value; updatePreview(); saveToLocalStorage(); }
+        }
+        function renderCertificationsList() {
+            const c = document.getElementById('certificationsList');
+            if (!c) return;
+            c.innerHTML = resumeData.certifications.map((cert, i) => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">Cert #${i+1}</span>
+                        <div class="list-item-actions"><button onclick="removeCertification(${cert.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Name</label><input class="form-input" value="${escHtml(cert.name)}" onchange="updateCertField(${cert.id},'name',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Organization</label><input class="form-input" value="${escHtml(cert.organization)}" onchange="updateCertField(${cert.id},'organization',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Date</label><input class="form-input" value="${escHtml(cert.date)}" onchange="updateCertField(${cert.id},'date',this.value)"></div>
+                </div>
+            `).join('');
         }
 
         function addLanguage() {
@@ -1180,12 +1227,22 @@
         }
         function updateLangField(id, field, value) {
             const lang = resumeData.languages.find(l => l.id === id);
-            if (lang) {
-                pushState();
-                lang[field] = value;
-                updatePreview();
-                saveToLocalStorage();
-            }
+            if (lang) { pushState(); lang[field] = value; updatePreview(); saveToLocalStorage(); }
+        }
+        function renderLanguagesList() {
+            const c = document.getElementById('languagesList');
+            if (!c) return;
+            const opts = ['Native','Fluent','Intermediate','Basic'];
+            c.innerHTML = resumeData.languages.map((l, i) => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">Lang #${i+1}</span>
+                        <div class="list-item-actions"><button onclick="removeLanguage(${l.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Language</label><input class="form-input" value="${escHtml(l.name)}" onchange="updateLangField(${l.id},'name',this.value)"></div>
+                    <div class="form-group"><label class="form-label">Level</label><select class="form-select" onchange="updateLangField(${l.id},'proficiency',this.value)">${opts.map(o => `<option value="${o}" ${l.proficiency===o?'selected':''}>${o}</option>`).join('')}</select></div>
+                </div>
+            `).join('');
         }
 
         function addCustomSection() {
@@ -1227,21 +1284,28 @@
             const section = resumeData.customSections.find(s => s.id === sectionId);
             if (section) {
                 const item = section.items.find(i => i.id === itemId);
-                if (item) {
-                    pushState();
-                    item[field] = value;
-                    updatePreview();
-                    saveToLocalStorage();
-                }
+                if (item) { pushState(); item[field] = value; updatePreview(); saveToLocalStorage(); }
             }
         }
-
-        // ============ RENDER LISTS ============
-        function escHtml(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
+        function renderCustomSectionsList() {
+            const c = document.getElementById('customSectionsList');
+            if (!c) return;
+            c.innerHTML = resumeData.customSections.map(s => `
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <span class="list-item-title">${escHtml(s.name)}</span>
+                        <div class="list-item-actions"><button onclick="removeCustomSection(${s.id})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                    ${s.items.map(item => `
+                        <div class="list-item" style="margin:6px 0;padding:8px;">
+                            <div style="display:flex;justify-content:flex-end;"><button onclick="removeCustomItem(${s.id},${item.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
+                            <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${escHtml(item.title)}" onchange="updateCustomField(${s.id},${item.id},'title',this.value)"></div>
+                            <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea rte-enabled" rows="2" onchange="updateCustomField(${s.id},${item.id},'description',this.value)">${escHtml(item.description)}</textarea></div>
+                        </div>
+                    `).join('')}
+                    <button class="add-item-btn" onclick="addCustomItem(${s.id})"><i class="fas fa-plus"></i> Add Item</button>
+                </div>
+            `).join('');
         }
 
         function renderAllLists() {
@@ -1253,153 +1317,28 @@
             renderCustomSectionsList();
         }
 
-        function renderExperienceList() {
-            const container = document.getElementById('experienceList');
-            if (!container) return;
-            container.innerHTML = resumeData.experience.map((exp, i) => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">#${i+1}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeExperience(${exp.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Company</label><input class="form-input" value="${escHtml(exp.company)}" placeholder="Company" onchange="updateExpField(${exp.id},'company',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${escHtml(exp.title)}" placeholder="Job Title" onchange="updateExpField(${exp.id},'title',this.value)"></div>
-                    <div class="form-row">
-                        <div class="form-group"><label class="form-label">Start</label><input class="form-input" value="${escHtml(exp.startDate)}" placeholder="MM/YYYY" onchange="updateExpField(${exp.id},'startDate',this.value)"></div>
-                        <div class="form-group"><label class="form-label">End</label><input class="form-input" value="${escHtml(exp.endDate)}" placeholder="MM/YYYY or Present" onchange="updateExpField(${exp.id},'endDate',this.value)"></div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Responsibilities..." onchange="updateExpField(${exp.id},'description',this.value)">${escHtml(exp.description)}</textarea></div>
-                </div>
-            `).join('');
+        function escHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
-        function renderEducationList() {
-            const container = document.getElementById('educationList');
-            if (!container) return;
-            container.innerHTML = resumeData.education.map((edu, i) => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">#${i+1}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeEducation(${edu.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">School</label><input class="form-input" value="${escHtml(edu.school)}" placeholder="University" onchange="updateEduField(${edu.id},'school',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Degree</label><input class="form-input" value="${escHtml(edu.degree)}" placeholder="Bachelor's" onchange="updateEduField(${edu.id},'degree',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Field</label><input class="form-input" value="${escHtml(edu.field)}" placeholder="Computer Science" onchange="updateEduField(${edu.id},'field',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Year</label><input class="form-input" value="${escHtml(edu.graduationYear)}" placeholder="YYYY" onchange="updateEduField(${edu.id},'graduationYear',this.value)"></div>
-                </div>
-            `).join('');
-        }
-
-        function renderProjectsList() {
-            const container = document.getElementById('projectsList');
-            if (!container) return;
-            container.innerHTML = resumeData.projects.map((proj, i) => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">#${i+1}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeProject(${proj.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Name</label><input class="form-input" value="${escHtml(proj.name)}" placeholder="Project" onchange="updateProjField(${proj.id},'name',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Description" onchange="updateProjField(${proj.id},'description',this.value)">${escHtml(proj.description)}</textarea></div>
-                    <div class="form-group"><label class="form-label">Tech</label><input class="form-input" value="${escHtml(proj.technologies)}" placeholder="React, Node..." onchange="updateProjField(${proj.id},'technologies',this.value)"></div>
-                </div>
-            `).join('');
-        }
-
-        function renderCertificationsList() {
-            const container = document.getElementById('certificationsList');
-            if (!container) return;
-            container.innerHTML = resumeData.certifications.map((cert, i) => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">#${i+1}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeCertification(${cert.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Name</label><input class="form-input" value="${escHtml(cert.name)}" placeholder="Certification" onchange="updateCertField(${cert.id},'name',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Organization</label><input class="form-input" value="${escHtml(cert.organization)}" placeholder="Issuer" onchange="updateCertField(${cert.id},'organization',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Date</label><input class="form-input" value="${escHtml(cert.date)}" placeholder="MM/YYYY" onchange="updateCertField(${cert.id},'date',this.value)"></div>
-                </div>
-            `).join('');
-        }
-
-        function renderLanguagesList() {
-            const container = document.getElementById('languagesList');
-            if (!container) return;
-            const opts = ['Native','Fluent','Intermediate','Basic'];
-            container.innerHTML = resumeData.languages.map((lang, i) => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">#${i+1}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeLanguage(${lang.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Language</label><input class="form-input" value="${escHtml(lang.name)}" placeholder="English" onchange="updateLangField(${lang.id},'name',this.value)"></div>
-                    <div class="form-group"><label class="form-label">Level</label><select class="form-select" onchange="updateLangField(${lang.id},'proficiency',this.value)">
-                        <option value="">Select</option>
-                        ${opts.map(o => `<option value="${o}" ${lang.proficiency===o?'selected':''}>${o}</option>`).join('')}
-                    </select></div>
-                </div>
-            `).join('');
-        }
-
-        function renderCustomSectionsList() {
-            const container = document.getElementById('customSectionsList');
-            if (!container) return;
-            container.innerHTML = resumeData.customSections.map(section => `
-                <div class="list-item">
-                    <div class="list-item-header">
-                        <span class="list-item-title">${escHtml(section.name)}</span>
-                        <div class="list-item-actions">
-                            <button onclick="removeCustomSection(${section.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    ${section.items.map(item => `
-                        <div class="list-item" style="margin:8px 0;padding:10px;">
-                            <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
-                                <button onclick="removeCustomItem(${section.id},${item.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:11px;"><i class="fas fa-times"></i></button>
-                            </div>
-                            <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${escHtml(item.title)}" placeholder="Title" onchange="updateCustomField(${section.id},${item.id},'title',this.value)"></div>
-                            <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Details" onchange="updateCustomField(${section.id},${item.id},'description',this.value)">${escHtml(item.description)}</textarea></div>
-                        </div>
-                    `).join('')}
-                    <button class="add-item-btn" style="font-size:11px;" onclick="addCustomItem(${section.id})"><i class="fas fa-plus"></i> Add Item</button>
-                </div>
-            `).join('');
-        }
-
-        // ============ PREVIEW ============
+        // ============ PREVIEW ENGINE ============
         function updatePreview() {
-            const content = document.getElementById('resumeContent');
-            if (!content) return;
-            
+            const container = document.getElementById('resumePages');
+            if (!container) return;
+
             const data = resumeData;
             const theme = data.resumeTheme || '#6366f1';
-            let html = '';
+            const style = data.style || DEFAULT_DATA.style;
+            const hasData = checkHasData(data);
 
-            // Check if there's any data
-            const hasData = data.personal.fullName || data.personal.email || data.summary.careerObjective ||
-                data.experience.some(e => e.company || e.title) ||
-                data.education.some(e => e.school || e.degree) ||
-                data.skills.languages || data.skills.frameworks || data.skills.tools ||
-                data.projects.some(p => p.name) ||
-                data.certifications.some(c => c.name) ||
-                data.languages.some(l => l.name) ||
-                data.customSections.some(s => s.items.some(i => i.title));
-
-            if (!hasData && !data.photo) {
-                content.innerHTML = `<div style="text-align:center;padding:80px 40px;color:#999;">
+            if (!hasData) {
+                container.innerHTML = `<div style="text-align:center;padding:80px 40px;color:#999;">
                     <i class="fas fa-file-alt" style="font-size:64px;display:block;margin-bottom:20px;opacity:0.3;"></i>
-                    <h2 style="color:#999;font-weight:300;margin-bottom:10px;">Your Resume Preview</h2>
-                    <p style="color:#bbb;font-size:14px;">Fill in your details to see the live preview here</p>
+                    <h2 style="color:#999;font-weight:300;">Your Resume Preview</h2>
+                    <p style="color:#bbb;">Fill in your details to see the live preview</p>
                 </div>`;
                 return;
             }
@@ -1413,167 +1352,320 @@
             };
 
             const gen = generators[data.template] || genModern;
-            html = gen(data, theme);
-            content.innerHTML = html;
+            const fullHTML = gen(data, theme, style);
+            
+            // Split into pages if content is long
+            const pages = splitIntoPages(fullHTML, style);
+            container.innerHTML = pages.map((pageHTML, i) => `
+                <div class="resume-page" style="margin-bottom:20px;${i > 0 ? 'margin-top:20px;' : ''}">
+                    <div class="resume-content" style="font-family:${style.fontFamily};font-size:${style.fontSize}px;">${pageHTML}</div>
+                </div>
+            `).join('');
+
+            // Apply zoom
+            document.querySelectorAll('.resume-page').forEach(page => {
+                page.style.transform = `scale(${currentZoom/100})`;
+            });
         }
 
-        function genModern(data, theme) {
-            let h = `<div style="font-family:Georgia,serif;color:#1a1a1a;">`;
-            if (data.photo) h += `<div style="text-align:center;margin-bottom:16px;"><img src="${data.photo}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid ${theme};"></div>`;
-            h += `<h1 style="font-size:26px;text-align:center;margin-bottom:4px;">${escHtml(data.personal.fullName) || 'Your Name'}</h1>`;
-            h += `<p style="text-align:center;font-size:15px;color:${theme};">${escHtml(data.summary.currentTitle) || ''}</p>`;
+        function splitIntoPages(html, style) {
+            // Simple heuristic: if content is very long, split at section boundaries
+            const sections = html.split(/(?=<div style="margin-bottom:)/);
+            if (sections.length <= 8) return [html];
+            
+            const pages = [];
+            let currentPage = '';
+            let sectionCount = 0;
+            const maxSectionsPerPage = 7;
+            
+            for (const section of sections) {
+                if (sectionCount >= maxSectionsPerPage && section.trim()) {
+                    pages.push(currentPage);
+                    currentPage = section;
+                    sectionCount = 1;
+                } else {
+                    currentPage += section;
+                    sectionCount++;
+                }
+            }
+            if (currentPage.trim()) pages.push(currentPage);
+            
+            return pages.length > 0 ? pages : [html];
+        }
+
+        function checkHasData(data) {
+            return data.personal.fullName || data.personal.email || data.summary.careerObjective ||
+                data.experience.some(e => e.company || e.title) ||
+                data.education.some(e => e.school || e.degree) ||
+                data.skills.languages || data.skills.frameworks || data.skills.tools ||
+                data.projects.some(p => p.name) ||
+                data.certifications.some(c => c.name) ||
+                data.languages.some(l => l.name) ||
+                data.customSections.some(s => s.items.some(i => i.title)) ||
+                data.photo;
+        }
+
+        function getBulletChar(style) {
+            const map = { 'disc': '•', 'square': '▪', 'dash': '—', 'arrow': '→' };
+            return map[style] || '•';
+        }
+
+        function sectionHTML(title, content, theme, style) {
+            const hSize = parseInt(style.headingSize) || 16;
+            return `<div style="margin-bottom:16px;">
+                <h2 style="font-size:${hSize}px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:2px solid ${theme};padding-bottom:5px;margin-bottom:10px;color:${theme};">${title}</h2>
+                ${content}
+            </div>`;
+        }
+
+        function genModern(data, theme, style) {
+            let h = '';
+            if (data.photo) h += `<div style="text-align:center;margin-bottom:14px;"><img src="${data.photo}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid ${theme};"></div>`;
+            h += `<h1 style="font-size:${parseInt(style.headingSize)+8}px;text-align:center;margin-bottom:3px;">${escHtml(data.personal.fullName) || 'Your Name'}</h1>`;
+            h += `<p style="text-align:center;font-size:${parseInt(style.fontSize)+2}px;color:${theme};font-weight:600;">${escHtml(data.summary.currentTitle) || ''}</p>`;
             
             const contacts = [data.personal.email, data.personal.phone, data.personal.altPhone, data.personal.city, data.personal.linkedin].filter(Boolean);
-            if (contacts.length) h += `<p style="text-align:center;font-size:11px;color:#666;margin:10px 0;">${contacts.join(' | ')}</p>`;
-            h += `<hr style="border:none;border-top:2px solid ${theme};margin:16px 0;">`;
+            if (contacts.length) h += `<p style="text-align:center;font-size:${parseInt(style.fontSize)-1}px;color:#666;margin:8px 0;">${contacts.join(' | ')}</p>`;
+            h += `<hr style="border:none;border-top:2px solid ${theme};margin:14px 0;">`;
 
-            if (data.summary.careerObjective) h += section('Professional Summary', `<p style="font-size:12px;line-height:1.7;">${escHtml(data.summary.careerObjective)}</p>`);
-            if (data.experience.some(e=>e.company||e.title)) {
+            if (data.summary.careerObjective) h += sectionHTML('Professional Summary', `<p style="line-height:1.7;">${escHtml(data.summary.careerObjective)}</p>`, theme, style);
+            
+            if (data.experience.some(e => e.company || e.title)) {
                 let ex = '';
                 data.experience.forEach(e => {
-                    if (e.company||e.title) ex += `<div style="margin-bottom:12px;"><h3 style="font-size:13px;color:${theme};">${escHtml(e.title||'')}${e.company?' - '+escHtml(e.company):''}</h3><p style="font-size:11px;color:#888;">${escHtml(e.startDate||'')} ${e.endDate?'- '+escHtml(e.endDate):''}</p><p style="font-size:11px;">${escHtml(e.description||'')}</p></div>`;
+                    if (e.company || e.title) ex += `<div style="margin-bottom:10px;"><h3 style="font-size:${parseInt(style.fontSize)+1}px;color:${theme};">${escHtml(e.title||'')}${e.company?' - '+escHtml(e.company):''}</h3><p style="font-size:${parseInt(style.fontSize)-1}px;color:#888;">${escHtml(e.startDate||'')} ${e.endDate?'- '+escHtml(e.endDate):''}</p><p>${escHtml(e.description||'')}</p></div>`;
                 });
-                h += section('Experience', ex);
+                h += sectionHTML('Experience', ex, theme, style);
             }
-            if (data.education.some(e=>e.school||e.degree)) {
-                let ed = '';
-                data.education.forEach(e => {
-                    if (e.school||e.degree) ed += `<p style="font-size:12px;margin-bottom:4px;"><strong>${escHtml(e.degree||'')}${e.field?' in '+escHtml(e.field):''}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`;
-                });
-                h += section('Education', ed);
+
+            if (data.education.some(e => e.school || e.degree)) {
+                let ed = data.education.filter(e => e.school || e.degree).map(e => `<p style="margin-bottom:3px;"><strong>${escHtml(e.degree||'')}${e.field?' in '+escHtml(e.field):''}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`).join('');
+                h += sectionHTML('Education', ed, theme, style);
             }
-            if (data.skills.languages||data.skills.frameworks||data.skills.tools) {
-                let sk = [];
-                if (data.skills.languages) sk.push(`<strong>Languages:</strong> ${escHtml(data.skills.languages)}`);
-                if (data.skills.frameworks) sk.push(`<strong>Frameworks:</strong> ${escHtml(data.skills.frameworks)}`);
-                if (data.skills.tools) sk.push(`<strong>Tools:</strong> ${escHtml(data.skills.tools)}`);
-                if (data.skills.databases) sk.push(`<strong>Databases:</strong> ${escHtml(data.skills.databases)}`);
-                if (data.skills.softSkills) sk.push(`<strong>Soft Skills:</strong> ${escHtml(data.skills.softSkills)}`);
-                h += section('Skills', `<p style="font-size:11px;line-height:2;">${sk.join('<br>')}</p>`);
+
+            const skillLines = [];
+            if (data.skills.languages) skillLines.push(`<strong>Languages:</strong> ${escHtml(data.skills.languages)}`);
+            if (data.skills.frameworks) skillLines.push(`<strong>Frameworks:</strong> ${escHtml(data.skills.frameworks)}`);
+            if (data.skills.tools) skillLines.push(`<strong>Tools:</strong> ${escHtml(data.skills.tools)}`);
+            if (data.skills.databases) skillLines.push(`<strong>Databases:</strong> ${escHtml(data.skills.databases)}`);
+            if (data.skills.softSkills) skillLines.push(`<strong>Soft Skills:</strong> ${escHtml(data.skills.softSkills)}`);
+            if (skillLines.length) h += sectionHTML('Skills', `<p style="line-height:2;">${skillLines.join('<br>')}</p>`, theme, style);
+
+            if (data.projects.some(p => p.name)) {
+                let pr = data.projects.filter(p => p.name).map(p => `<div style="margin-bottom:6px;"><h3 style="font-size:${parseInt(style.fontSize)+1}px;color:${theme};">${escHtml(p.name)}</h3><p>${escHtml(p.description||'')}</p><p style="font-size:${parseInt(style.fontSize)-1}px;color:#888;">${escHtml(p.technologies||'')}</p></div>`).join('');
+                h += sectionHTML('Projects', pr, theme, style);
             }
-            if (data.projects.some(p=>p.name)) {
-                let pr = '';
-                data.projects.forEach(p => {
-                    if (p.name) pr += `<div style="margin-bottom:8px;"><h3 style="font-size:12px;color:${theme};">${escHtml(p.name)}</h3><p style="font-size:11px;">${escHtml(p.description||'')}</p><p style="font-size:10px;color:#888;">${escHtml(p.technologies||'')}</p></div>`;
-                });
-                h += section('Projects', pr);
+
+            if (data.certifications.some(c => c.name)) {
+                let ce = data.certifications.filter(c => c.name).map(c => `<p style="margin-bottom:2px;">${getBulletChar(style.bulletStyle)} <strong>${escHtml(c.name)}</strong> - ${escHtml(c.organization||'')} (${escHtml(c.date||'')})</p>`).join('');
+                h += sectionHTML('Certifications', ce, theme, style);
             }
-            if (data.certifications.some(c=>c.name)) {
-                let ce = data.certifications.filter(c=>c.name).map(c => `<p style="font-size:11px;margin-bottom:3px;">• <strong>${escHtml(c.name)}</strong> - ${escHtml(c.organization||'')} (${escHtml(c.date||'')})</p>`).join('');
-                h += section('Certifications', ce);
+
+            if (data.languages.some(l => l.name)) {
+                h += sectionHTML('Languages', `<p>${data.languages.filter(l=>l.name).map(l=>`${escHtml(l.name)} (${escHtml(l.proficiency||'N/A')})`).join(' • ')}</p>`, theme, style);
             }
-            if (data.languages.some(l=>l.name)) {
-                h += section('Languages', `<p style="font-size:11px;">${data.languages.filter(l=>l.name).map(l=>`${escHtml(l.name)} (${escHtml(l.proficiency||'N/A')})`).join(' • ')}</p>`);
-            }
+
             data.customSections.forEach(s => {
-                let items = s.items.filter(i=>i.title).map(i => `<div style="margin-bottom:6px;"><h3 style="font-size:12px;color:${theme};">${escHtml(i.title)}</h3><p style="font-size:11px;">${escHtml(i.description||'')}</p></div>`).join('');
-                if (items) h += section(s.name, items);
+                let items = s.items.filter(i=>i.title).map(i => `<div style="margin-bottom:4px;"><h3 style="font-size:${parseInt(style.fontSize)+1}px;color:${theme};">${escHtml(i.title)}</h3><p>${escHtml(i.description||'')}</p></div>`).join('');
+                if (items) h += sectionHTML(s.name, items, theme, style);
             });
-            h += '</div>';
+
             return h;
         }
 
-        function section(title, content) {
-            return `<div style="margin-bottom:18px;"><h2 style="font-size:14px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:2px solid #eee;padding-bottom:6px;margin-bottom:10px;">${title}</h2>${content}</div>`;
-        }
-
-        function genMinimal(data, theme) {
-            let h = '<div style="display:flex;gap:24px;font-family:Helvetica,Arial,sans-serif;">';
-            h += '<div style="width:32%;background:#f8f9fa;padding:18px;">';
-            if (data.photo) h += `<img src="${data.photo}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;">`;
-            h += `<h1 style="font-size:16px;">${escHtml(data.personal.fullName)||'Name'}</h1>`;
-            h += `<p style="font-size:11px;color:${theme};">${escHtml(data.summary.currentTitle)||''}</p>`;
+        function genMinimal(data, theme, style) {
+            let h = '<div style="display:flex;gap:20px;">';
+            h += '<div style="width:30%;background:#f8f9fa;padding:16px;border-radius:4px;">';
+            if (data.photo) h += `<img src="${data.photo}" style="width:65px;height:65px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 10px;">`;
+            h += `<h1 style="font-size:${parseInt(style.headingSize)}px;">${escHtml(data.personal.fullName)||'Name'}</h1>`;
+            h += `<p style="font-size:${parseInt(style.fontSize)-1}px;color:${theme};">${escHtml(data.summary.currentTitle)||''}</p>`;
             if (data.personal.email||data.personal.phone||data.personal.city) {
-                h += '<h3 style="font-size:9px;text-transform:uppercase;color:#999;margin-top:14px;">Contact</h3>';
-                if (data.personal.email) h += `<p style="font-size:10px;">${escHtml(data.personal.email)}</p>`;
-                if (data.personal.phone) h += `<p style="font-size:10px;">${escHtml(data.personal.phone)}</p>`;
-                if (data.personal.altPhone) h += `<p style="font-size:10px;">${escHtml(data.personal.altPhone)}</p>`;
-                if (data.personal.city) h += `<p style="font-size:10px;">${escHtml(data.personal.city)}</p>`;
+                h += `<h3 style="font-size:9px;text-transform:uppercase;color:#999;margin-top:12px;">Contact</h3>`;
+                if (data.personal.email) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.personal.email)}</p>`;
+                if (data.personal.phone) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.personal.phone)}</p>`;
+                if (data.personal.altPhone) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.personal.altPhone)}</p>`;
+                if (data.personal.city) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.personal.city)}</p>`;
             }
             if (data.skills.languages||data.skills.tools) {
-                h += '<h3 style="font-size:9px;text-transform:uppercase;color:#999;margin-top:14px;">Skills</h3>';
-                if (data.skills.languages) h += `<p style="font-size:10px;">${escHtml(data.skills.languages)}</p>`;
-                if (data.skills.tools) h += `<p style="font-size:10px;">${escHtml(data.skills.tools)}</p>`;
+                h += `<h3 style="font-size:9px;text-transform:uppercase;color:#999;margin-top:12px;">Skills</h3>`;
+                if (data.skills.languages) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.skills.languages)}</p>`;
+                if (data.skills.tools) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;">${escHtml(data.skills.tools)}</p>`;
             }
-            h += '</div><div style="width:68%;padding:18px 0;">';
-            if (data.summary.careerObjective) h += section('Summary', `<p style="font-size:11px;line-height:1.6;">${escHtml(data.summary.careerObjective)}</p>`);
+            h += '</div><div style="width:70%;padding:16px 0;">';
+            if (data.summary.careerObjective) h += sectionHTML('Summary', `<p style="line-height:1.6;">${escHtml(data.summary.careerObjective)}</p>`, theme, style);
             if (data.experience.some(e=>e.company||e.title)) {
-                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="margin-bottom:10px;"><h3 style="font-size:12px;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</h3><p style="font-size:10px;color:#999;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</p><p style="font-size:10px;">${escHtml(e.description||'')}</p></div>`).join('');
-                h += section('Experience', ex);
+                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="margin-bottom:8px;"><h3 style="font-size:${parseInt(style.fontSize)}px;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</h3><p style="font-size:${parseInt(style.fontSize)-2}px;color:#999;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</p><p style="font-size:${parseInt(style.fontSize)-1}px;">${escHtml(e.description||'')}</p></div>`).join('');
+                h += sectionHTML('Experience', ex, theme, style);
             }
             if (data.education.some(e=>e.school||e.degree)) {
-                let ed = data.education.filter(e=>e.school||e.degree).map(e => `<p style="font-size:11px;"><strong>${escHtml(e.degree||'')}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`).join('');
-                h += section('Education', ed);
+                let ed = data.education.filter(e=>e.school||e.degree).map(e => `<p style="font-size:${parseInt(style.fontSize)-1}px;"><strong>${escHtml(e.degree||'')}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`).join('');
+                h += sectionHTML('Education', ed, theme, style);
             }
+            // Add remaining sections to right column
+            if (data.projects.some(p=>p.name)) {
+                let pr = data.projects.filter(p=>p.name).map(p => `<div style="margin-bottom:4px;"><strong>${escHtml(p.name)}</strong><p style="font-size:${parseInt(style.fontSize)-1}px;">${escHtml(p.description||'')}</p></div>`).join('');
+                h += sectionHTML('Projects', pr, theme, style);
+            }
+            if (data.certifications.some(c=>c.name)) {
+                let ce = data.certifications.filter(c=>c.name).map(c => `<p style="font-size:${parseInt(style.fontSize)-1}px;">${getBulletChar(style.bulletStyle)} ${escHtml(c.name)} - ${escHtml(c.organization||'')}</p>`).join('');
+                h += sectionHTML('Certifications', ce, theme, style);
+            }
+            if (data.languages.some(l=>l.name)) {
+                h += sectionHTML('Languages', `<p style="font-size:${parseInt(style.fontSize)-1}px;">${data.languages.filter(l=>l.name).map(l=>`${escHtml(l.name)} (${escHtml(l.proficiency||'')})`).join(' • ')}</p>`, theme, style);
+            }
+            data.customSections.forEach(s => {
+                let items = s.items.filter(i=>i.title).map(i => `<div style="margin-bottom:3px;"><strong>${escHtml(i.title)}</strong><p style="font-size:${parseInt(style.fontSize)-1}px;">${escHtml(i.description||'')}</p></div>`).join('');
+                if (items) h += sectionHTML(s.name, items, theme, style);
+            });
             h += '</div></div>';
             return h;
         }
 
-        function genCreative(data, theme) {
-            let h = '<div style="font-family:Montserrat,sans-serif;">';
-            h += `<div style="background:linear-gradient(135deg,${theme},${theme}dd);color:white;padding:24px;margin:-20mm -18mm 18px -18mm;">`;
-            if (data.photo) h += `<img src="${data.photo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid white;margin-bottom:8px;">`;
-            h += `<h1 style="font-size:28px;color:white!important;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
-            h += `<p style="font-size:14px;color:rgba(255,255,255,0.9)!important;">${escHtml(data.summary.currentTitle)||''}</p>`;
-            if (data.personal.email||data.personal.phone) h += `<p style="font-size:10px;color:rgba(255,255,255,0.8)!important;margin-top:8px;">${[data.personal.email,data.personal.phone,data.personal.city].filter(Boolean).join(' | ')}</p>`;
+        function genCreative(data, theme, style) {
+            let h = '';
+            h += `<div style="background:linear-gradient(135deg,${theme},${theme}dd);color:white;padding:22px;margin:-20mm -18mm 16px -18mm;border-radius:0 0 20px 20px;">`;
+            if (data.photo) h += `<img src="${data.photo}" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid white;margin-bottom:6px;">`;
+            h += `<h1 style="font-size:${parseInt(style.headingSize)+10}px;color:white!important;margin-bottom:2px;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
+            h += `<p style="font-size:${parseInt(style.fontSize)+2}px;color:rgba(255,255,255,0.9)!important;">${escHtml(data.summary.currentTitle)||''}</p>`;
+            const contacts = [data.personal.email, data.personal.phone, data.personal.city].filter(Boolean);
+            if (contacts.length) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;color:rgba(255,255,255,0.8)!important;margin-top:6px;">${contacts.join(' | ')}</p>`;
             h += '</div>';
-            if (data.summary.careerObjective) h += `<div style="background:#f0f0ff;padding:12px;border-radius:6px;margin-bottom:16px;"><p style="font-size:11px;line-height:1.6;">${escHtml(data.summary.careerObjective)}</p></div>`;
+
+            if (data.summary.careerObjective) h += `<div style="background:#f0f0ff;padding:10px;border-radius:6px;margin-bottom:14px;border-left:4px solid ${theme};"><p style="line-height:1.6;">${escHtml(data.summary.careerObjective)}</p></div>`;
+
             if (data.experience.some(e=>e.company||e.title)) {
-                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="border-left:3px solid ${theme};padding-left:12px;margin-bottom:12px;"><h3 style="font-size:13px;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</h3><p style="font-size:10px;color:#999;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</p><p style="font-size:11px;">${escHtml(e.description||'')}</p></div>`).join('');
-                h += `<h2 style="font-size:16px;color:${theme}!important;">Experience</h2>${ex}`;
+                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="border-left:3px solid ${theme};padding-left:10px;margin-bottom:10px;"><h3 style="font-size:${parseInt(style.fontSize)+1}px;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</h3><p style="font-size:${parseInt(style.fontSize)-1}px;color:#888;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</p><p>${escHtml(e.description||'')}</p></div>`).join('');
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;">⚡ Experience</h2>${ex}`;
             }
-            if (data.skills.languages||data.skills.tools) {
-                const allSkills = [data.skills.languages,data.skills.frameworks,data.skills.tools,data.skills.databases].filter(Boolean).join(',').split(',').map(s=>s.trim()).filter(Boolean);
-                h += `<h2 style="font-size:16px;color:${theme}!important;margin-top:14px;">Skills</h2><div style="display:flex;flex-wrap:wrap;gap:6px;">`;
-                allSkills.forEach(s => h += `<span style="background:${theme};color:white!important;padding:3px 10px;border-radius:12px;font-size:10px;">${escHtml(s)}</span>`);
+
+            if (data.education.some(e=>e.school||e.degree)) {
+                let ed = data.education.filter(e=>e.school||e.degree).map(e => `<div style="margin-bottom:6px;padding-left:10px;border-left:3px solid ${theme}88;"><p><strong>${escHtml(e.degree||'')}</strong> - ${escHtml(e.school||'')}</p><p style="font-size:${parseInt(style.fontSize)-1}px;color:#888;">${escHtml(e.graduationYear||'')}</p></div>`).join('');
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">🎓 Education</h2>${ed}`;
+            }
+
+            const allSkills = [data.skills.languages, data.skills.frameworks, data.skills.tools, data.skills.databases].filter(Boolean).join(',').split(',').map(s=>s.trim()).filter(Boolean);
+            if (allSkills.length) {
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">🛠 Skills</h2><div style="display:flex;flex-wrap:wrap;gap:5px;">`;
+                allSkills.forEach(s => h += `<span style="background:${theme};color:white!important;padding:2px 9px;border-radius:10px;font-size:${parseInt(style.fontSize)-2}px;">${escHtml(s)}</span>`);
                 h += '</div>';
             }
-            h += '</div>';
+
+            if (data.projects.some(p=>p.name)) {
+                let pr = data.projects.filter(p=>p.name).map(p => `<div style="margin-bottom:4px;"><strong>${escHtml(p.name)}</strong> - <span style="font-size:${parseInt(style.fontSize)-1}px;">${escHtml(p.description||'')}</span></div>`).join('');
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">📁 Projects</h2>${pr}`;
+            }
+
+            if (data.certifications.some(c=>c.name)) {
+                let ce = data.certifications.filter(c=>c.name).map(c => `<p style="margin-bottom:2px;">${getBulletChar(style.bulletStyle)} ${escHtml(c.name)}</p>`).join('');
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">📜 Certifications</h2>${ce}`;
+            }
+
+            if (data.languages.some(l=>l.name)) {
+                h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">🌐 Languages</h2><p>${data.languages.filter(l=>l.name).map(l=>`${escHtml(l.name)} (${escHtml(l.proficiency||'')})`).join(' • ')}</p>`;
+            }
+
+            data.customSections.forEach(s => {
+                let items = s.items.filter(i=>i.title).map(i => `<div style="margin-bottom:3px;"><strong>${escHtml(i.title)}</strong><p style="font-size:${parseInt(style.fontSize)-1}px;">${escHtml(i.description||'')}</p></div>`).join('');
+                if (items) h += `<h2 style="font-size:${parseInt(style.headingSize)}px;color:${theme}!important;margin-top:12px;">📋 ${escHtml(s.name)}</h2>${items}`;
+            });
+
             return h;
         }
 
-        function genClassic(data, theme) {
-            let h = '<div style="font-family:Times New Roman,serif;text-align:center;">';
-            h += `<h1 style="font-size:22px;text-transform:uppercase;letter-spacing:2px;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
-            if (data.summary.currentTitle) h += `<p style="font-size:13px;">${escHtml(data.summary.currentTitle)}</p>`;
-            const contacts = [data.personal.email,data.personal.phone,data.personal.city,data.personal.linkedin].filter(Boolean);
-            if (contacts.length) h += `<p style="font-size:10px;margin:8px 0;">${contacts.join(' • ')}</p>`;
+        function genClassic(data, theme, style) {
+            let h = '<div style="text-align:center;">';
+            h += `<h1 style="font-size:${parseInt(style.headingSize)+4}px;text-transform:uppercase;letter-spacing:2px;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
+            if (data.summary.currentTitle) h += `<p style="font-size:${parseInt(style.fontSize)}px;">${escHtml(data.summary.currentTitle)}</p>`;
+            const contacts = [data.personal.email, data.personal.phone, data.personal.city, data.personal.linkedin].filter(Boolean);
+            if (contacts.length) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;margin:6px 0;">${contacts.join(' • ')}</p>`;
             h += `<hr style="border:1px solid ${theme};">`;
-            if (data.summary.careerObjective) h += `<div style="text-align:left;margin:14px 0;"><h2 style="font-size:13px;text-align:center;text-transform:uppercase;">Objective</h2><p style="font-size:11px;line-height:1.6;">${escHtml(data.summary.careerObjective)}</p></div>`;
+            if (data.summary.careerObjective) h += `<div style="text-align:left;margin:12px 0;"><h2 style="font-size:${parseInt(style.headingSize)}px;text-align:center;text-transform:uppercase;">Objective</h2><p style="line-height:1.6;">${escHtml(data.summary.careerObjective)}</p></div>`;
             if (data.experience.some(e=>e.company||e.title)) {
-                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="text-align:left;margin-bottom:10px;"><p style="font-size:12px;font-weight:bold;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</p><p style="font-size:10px;font-style:italic;">${escHtml(e.startDate||'')} to ${escHtml(e.endDate||'Present')}</p><p style="font-size:10px;">${escHtml(e.description||'')}</p></div>`).join('');
-                h += `<div style="text-align:left;"><h2 style="font-size:13px;text-align:center;text-transform:uppercase;">Experience</h2>${ex}</div>`;
+                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="text-align:left;margin-bottom:8px;"><p style="font-weight:bold;">${escHtml(e.title||'')} - ${escHtml(e.company||'')}</p><p style="font-style:italic;font-size:${parseInt(style.fontSize)-1}px;">${escHtml(e.startDate||'')} to ${escHtml(e.endDate||'Present')}</p><p>${escHtml(e.description||'')}</p></div>`).join('');
+                h += `<div style="text-align:left;"><h2 style="font-size:${parseInt(style.headingSize)}px;text-align:center;text-transform:uppercase;">Experience</h2>${ex}</div>`;
+            }
+            if (data.education.some(e=>e.school||e.degree)) {
+                let ed = data.education.filter(e=>e.school||e.degree).map(e => `<p style="text-align:left;"><strong>${escHtml(e.degree||'')}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`).join('');
+                h += `<div style="text-align:left;"><h2 style="font-size:${parseInt(style.headingSize)}px;text-align:center;text-transform:uppercase;">Education</h2>${ed}</div>`;
             }
             h += '</div>';
             return h;
         }
 
-        function genExecutive(data, theme) {
-            let h = '<div style="font-family:Calibri,sans-serif;">';
-            h += `<div style="border-bottom:3px solid ${theme};padding-bottom:12px;margin-bottom:16px;">`;
-            if (data.photo) h += `<img src="${data.photo}" style="width:80px;height:80px;border-radius:4px;object-fit:cover;float:right;margin-left:12px;">`;
-            h += `<h1 style="font-size:24px;color:#1a3a5c!important;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
-            h += `<p style="font-size:14px;color:#555;">${escHtml(data.summary.currentTitle)||'Professional'}</p>`;
-            const contacts = [data.personal.email,data.personal.phone,data.personal.linkedin].filter(Boolean);
-            if (contacts.length) h += `<p style="font-size:10px;color:#777;margin-top:4px;">${contacts.join(' • ')}</p>`;
+        function genExecutive(data, theme, style) {
+            let h = '';
+            h += `<div style="border-bottom:3px solid ${theme};padding-bottom:10px;margin-bottom:14px;">`;
+            if (data.photo) h += `<img src="${data.photo}" style="width:75px;height:75px;border-radius:4px;object-fit:cover;float:right;margin-left:10px;">`;
+            h += `<h1 style="font-size:${parseInt(style.headingSize)+6}px;color:#1a3a5c;">${escHtml(data.personal.fullName)||'Your Name'}</h1>`;
+            h += `<p style="font-size:${parseInt(style.fontSize)+1}px;color:#555;">${escHtml(data.summary.currentTitle)||'Professional'}</p>`;
+            const contacts = [data.personal.email, data.personal.phone, data.personal.linkedin].filter(Boolean);
+            if (contacts.length) h += `<p style="font-size:${parseInt(style.fontSize)-2}px;color:#777;margin-top:3px;">${contacts.join(' • ')}</p>`;
             h += '<div style="clear:both;"></div></div>';
-            if (data.summary.careerObjective) h += section('Executive Summary', `<p style="font-size:11px;line-height:1.7;">${escHtml(data.summary.careerObjective)}</p>`);
+
+            if (data.summary.careerObjective) h += sectionHTML('Executive Summary', `<p style="line-height:1.7;">${escHtml(data.summary.careerObjective)}</p>`, theme, style);
+            
             if (data.experience.some(e=>e.company||e.title)) {
-                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;"><div style="display:flex;justify-content:space-between;"><h3 style="font-size:12px;">${escHtml(e.title||'')}</h3><span style="font-size:10px;color:#999;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</span></div><p style="font-size:11px;color:#555;">${escHtml(e.company||'')}</p><p style="font-size:10px;">${escHtml(e.description||'')}</p></div>`).join('');
-                h += section('Professional Experience', ex);
+                let ex = data.experience.filter(e=>e.company||e.title).map(e => `<div style="margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #eee;"><div style="display:flex;justify-content:space-between;"><h3 style="font-size:${parseInt(style.fontSize)+1}px;">${escHtml(e.title||'')}</h3><span style="font-size:${parseInt(style.fontSize)-1}px;color:#999;">${escHtml(e.startDate||'')} - ${escHtml(e.endDate||'Present')}</span></div><p style="color:#555;">${escHtml(e.company||'')}</p><p>${escHtml(e.description||'')}</p></div>`).join('');
+                h += sectionHTML('Professional Experience', ex, theme, style);
             }
-            h += '</div>';
+
+            if (data.education.some(e=>e.school||e.degree)) {
+                let ed = data.education.filter(e=>e.school||e.degree).map(e => `<p style="margin-bottom:3px;"><strong>${escHtml(e.degree||'')}${e.field?' in '+escHtml(e.field):''}</strong> - ${escHtml(e.school||'')} (${escHtml(e.graduationYear||'')})</p>`).join('');
+                h += sectionHTML('Education', ed, theme, style);
+            }
+
             return h;
         }
 
-        // ============ THEME ============
+        // ============ STYLE & THEME ============
+        function updateStyle(property, value) {
+            pushState();
+            if (!resumeData.style) resumeData.style = { ...DEFAULT_DATA.style };
+            resumeData.style[property] = value;
+            updatePreview();
+            saveToLocalStorage();
+            showToast('Style updated', 'info');
+        }
+
         function setResumeTheme(color) {
             pushState();
             resumeData.resumeTheme = color;
             localStorage.setItem('resumeTheme', color);
-            updateThemeDots();
+            document.getElementById('currentThemeColor').textContent = color;
+            updateThemeColorActive();
             updatePreview();
             saveToLocalStorage();
+            showToast('Theme color updated', 'info');
+        }
+
+        function buildThemeColorGrid() {
+            const grid = document.getElementById('themeColorGrid');
+            if (!grid) return;
+            
+            const colors = [
+                '#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
+                '#ec4899','#06b6d4','#84cc16','#f97316','#6b7280','#1e293b',
+                '#a78bfa','#60a5fa','#34d399','#fbbf24','#f87171','#c084fc',
+                '#f9a8d4','#67e8f9','#bef264','#fdba74','#9ca3af','#475569',
+                '#c4b5fd','#93c5fd','#6ee7b7','#fde68a','#fca5a5','#d8b4fe',
+                '#e9d5ff','#bfdbfe','#a7f3d0','#fef3c7','#fecaca','#e9d5ff'
+            ];
+            
+            grid.innerHTML = colors.map(c => `
+                <div class="color-swatch ${resumeData.resumeTheme === c ? 'active' : ''}" 
+                     style="background:${c};" 
+                     onclick="setResumeTheme('${c}')"
+                     title="${c}"></div>
+            `).join('');
+            
+            document.getElementById('currentThemeColor').textContent = resumeData.resumeTheme;
+        }
+
+        function updateThemeColorActive() {
+            document.querySelectorAll('.color-swatch').forEach(sw => {
+                sw.classList.toggle('active', sw.style.backgroundColor === resumeData.resumeTheme || 
+                    (sw.style.backgroundColor === 'rgb(99, 102, 241)' && resumeData.resumeTheme === '#6366f1'));
+            });
         }
 
         function changeTemplate(template) {
@@ -1594,11 +1686,28 @@
         // ============ ZOOM ============
         function zoomPreview(change) {
             currentZoom = Math.max(40, Math.min(200, currentZoom + change));
-            document.getElementById('resumePage').style.transform = `scale(${currentZoom/100})`;
             document.getElementById('zoomLevel').textContent = `${currentZoom}%`;
+            document.querySelectorAll('.resume-page').forEach(page => {
+                page.style.transform = `scale(${currentZoom/100})`;
+            });
         }
 
-        // ============ IMPORT ============
+        // ============ MODALS ============
+        function showThemeModal() { document.getElementById('themeModal').style.display = 'flex'; buildThemeColorGrid(); }
+        function closeThemeModal() { document.getElementById('themeModal').style.display = 'none'; }
+        function showStyleModal() { document.getElementById('styleModal').style.display = 'flex'; }
+        function closeStyleModal() { document.getElementById('styleModal').style.display = 'none'; }
+        function showDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
+        function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
+
+        // Close modals on overlay click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // ============ IMPORT CV WITH GEMINI AI ============
         function importCV() {
             document.getElementById('cvImport').click();
         }
@@ -1608,7 +1717,7 @@
             if (!file) return;
             event.target.value = '';
             
-            showToast('Analyzing CV...', 'info');
+            showToast('Extracting text from CV...', 'info');
             
             try {
                 let text = '';
@@ -1632,24 +1741,171 @@
                     return;
                 }
                 
-                if (text.trim().length < 10) {
-                    showToast('Could not extract enough text from file.', 'error');
+                if (text.trim().length < 20) {
+                    showToast('Could not extract enough text.', 'error');
                     return;
                 }
                 
-                parseCV(text);
-                showToast('CV imported! Please review.', 'success');
+                // Try Gemini AI first, fallback to local parser
+                showToast('Analyzing with AI...', 'info');
+                const aiResult = await parseWithGemini(text);
+                
+                if (aiResult) {
+                    applyParsedData(aiResult);
+                    showToast('CV imported successfully with AI!', 'success');
+                } else {
+                    // Fallback to local parser
+                    showToast('AI unavailable, using local parser...', 'info');
+                    parseCVLocal(text);
+                    showToast('CV imported! Please review.', 'success');
+                }
             } catch (error) {
                 console.error('Import error:', error);
                 showToast('Error importing CV. Try a different file.', 'error');
             }
         }
 
-        function parseCV(text) {
+        async function parseWithGemini(text) {
+            try {
+                const prompt = `You are a CV parser. Extract the following information from this CV text and return ONLY valid JSON. Use empty strings for missing fields.
+
+{
+  "personal": {
+    "fullName": "",
+    "email": "",
+    "phone": "",
+    "altPhone": "",
+    "city": "",
+    "linkedin": "",
+    "github": "",
+    "portfolio": ""
+  },
+  "summary": {
+    "currentTitle": "",
+    "careerObjective": ""
+  },
+  "experience": [
+    {"company": "", "title": "", "startDate": "", "endDate": "", "description": ""}
+  ],
+  "education": [
+    {"school": "", "degree": "", "field": "", "graduationYear": ""}
+  ],
+  "skills": {
+    "languages": "",
+    "frameworks": "",
+    "tools": "",
+    "databases": "",
+    "softSkills": ""
+  },
+  "projects": [
+    {"name": "", "description": "", "technologies": ""}
+  ],
+  "certifications": [
+    {"name": "", "organization": "", "date": ""}
+  ],
+  "languages": [
+    {"name": "", "proficiency": ""}
+  ]
+}
+
+CV Text:
+${text.substring(0, 15000)}`;
+
+                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn('Gemini API error:', response.status);
+                    return null;
+                }
+
+                const data = await response.json();
+                const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                
+                // Extract JSON from response
+                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[0]);
+                }
+                return null;
+            } catch (error) {
+                console.warn('Gemini API failed, using local parser:', error);
+                return null;
+            }
+        }
+
+        function applyParsedData(parsed) {
+            pushState();
+            
+            if (parsed.personal) {
+                resumeData.personal = { ...resumeData.personal, ...parsed.personal };
+            }
+            if (parsed.summary) {
+                resumeData.summary = { ...resumeData.summary, ...parsed.summary };
+            }
+            if (parsed.experience && Array.isArray(parsed.experience)) {
+                resumeData.experience = parsed.experience.map(e => ({
+                    id: Date.now() + Math.random(),
+                    company: e.company || '',
+                    title: e.title || '',
+                    startDate: e.startDate || '',
+                    endDate: e.endDate || '',
+                    description: e.description || ''
+                }));
+            }
+            if (parsed.education && Array.isArray(parsed.education)) {
+                resumeData.education = parsed.education.map(e => ({
+                    id: Date.now() + Math.random(),
+                    school: e.school || '',
+                    degree: e.degree || '',
+                    field: e.field || '',
+                    graduationYear: e.graduationYear || ''
+                }));
+            }
+            if (parsed.skills) {
+                resumeData.skills = { ...resumeData.skills, ...parsed.skills };
+            }
+            if (parsed.projects && Array.isArray(parsed.projects)) {
+                resumeData.projects = parsed.projects.map(p => ({
+                    id: Date.now() + Math.random(),
+                    name: p.name || '',
+                    description: p.description || '',
+                    technologies: p.technologies || ''
+                }));
+            }
+            if (parsed.certifications && Array.isArray(parsed.certifications)) {
+                resumeData.certifications = parsed.certifications.map(c => ({
+                    id: Date.now() + Math.random(),
+                    name: c.name || '',
+                    organization: c.organization || '',
+                    date: c.date || ''
+                }));
+            }
+            if (parsed.languages && Array.isArray(parsed.languages)) {
+                resumeData.languages = parsed.languages.map(l => ({
+                    id: Date.now() + Math.random(),
+                    name: l.name || '',
+                    proficiency: l.proficiency || ''
+                }));
+            }
+            
+            populateAllFields();
+            updatePreview();
+            saveToLocalStorage();
+        }
+
+        function parseCVLocal(text) {
             pushState();
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
             
-            // Name detection
+            // Name
             const nameRegex = /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})$/;
             for (const line of lines) {
                 const match = line.match(nameRegex);
@@ -1667,8 +1923,7 @@
             if (emailMatch) resumeData.personal.email = emailMatch[0];
             
             // Phone
-            const phoneRegex = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
-            const phones = text.match(phoneRegex) || [];
+            const phones = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g) || [];
             if (phones[0]) resumeData.personal.phone = phones[0];
             if (phones[1]) resumeData.personal.altPhone = phones[1];
             
@@ -1680,60 +1935,10 @@
             const ghMatch = text.match(/github\.com\/[\w-]+/);
             if (ghMatch) resumeData.personal.github = 'https://' + ghMatch[0];
             
-            // Summary - first substantial paragraph
+            // Summary
             const paragraphs = text.split(/\n\s*\n/).filter(p => p.length > 30);
             if (paragraphs.length > 0) {
                 resumeData.summary.careerObjective = paragraphs[0].substring(0, 500);
-            }
-            
-            // Experience detection
-            const expSection = findSection(text, ['experience', 'employment', 'work history']);
-            if (expSection) {
-                resumeData.experience = [];
-                const expLines = expSection.split('\n').filter(l => l.length > 5);
-                let current = null;
-                for (const line of expLines) {
-                    if (/(?:at|@)\s+[A-Z]/.test(line) || /\d{4}\s*[-–]\s*(\d{4}|Present)/i.test(line) || /^[A-Z][A-Za-z\s]{3,40}$/.test(line)) {
-                        if (current && (current.company || current.title)) {
-                            resumeData.experience.push(current);
-                        }
-                        current = { id: Date.now() + Math.random(), company: '', title: line.substring(0, 50), startDate: '', endDate: '', description: '' };
-                        const dateMatch = line.match(/(\d{1,2}\/\d{4}|\d{4})\s*[-–]\s*(\d{1,2}\/\d{4}|\d{4}|Present)/i);
-                        if (dateMatch) {
-                            current.startDate = dateMatch[1];
-                            current.endDate = dateMatch[2];
-                        }
-                    } else if (current) {
-                        current.description += line + ' ';
-                    }
-                }
-                if (current && (current.company || current.title)) resumeData.experience.push(current);
-            }
-            
-            // Education
-            const eduSection = findSection(text, ['education', 'academic']);
-            if (eduSection) {
-                resumeData.education = [];
-                const eduLines = eduSection.split('\n').filter(l => l.length > 5);
-                for (const line of eduLines) {
-                    const yearMatch = line.match(/\b(20\d{2}|19\d{2})\b/);
-                    resumeData.education.push({
-                        id: Date.now() + Math.random(),
-                        school: line.substring(0, 60),
-                        degree: '',
-                        field: '',
-                        graduationYear: yearMatch ? yearMatch[0] : ''
-                    });
-                }
-            }
-            
-            // Skills
-            const skillSection = findSection(text, ['skills', 'technical', 'technologies']);
-            if (skillSection) {
-                const techs = ['Python','Java','JavaScript','TypeScript','C++','C#','Go','Rust','React','Angular','Vue','Node','Django','Spring','SQL','MongoDB','PostgreSQL','AWS','Azure','Docker','Kubernetes','Git','Linux','REST','GraphQL','Agile'];
-                const found = techs.filter(t => new RegExp('\\b'+t+'\\b','i').test(skillSection));
-                resumeData.skills.languages = found.slice(0,6).join(', ');
-                resumeData.skills.tools = found.slice(6,12).join(', ');
             }
             
             populateAllFields();
@@ -1741,92 +1946,66 @@
             saveToLocalStorage();
         }
 
-        function findSection(text, keywords) {
-            const lower = text.toLowerCase();
-            for (const kw of keywords) {
-                const idx = lower.indexOf(kw);
-                if (idx >= 0) {
-                    const start = lower.lastIndexOf('\n\n', idx);
-                    const end = lower.indexOf('\n\n', idx + kw.length);
-                    if (end > start) {
-                        return text.substring(start > 0 ? start : idx, end > 0 ? end : text.length);
-                    }
-                    return text.substring(idx);
-                }
-            }
-            return null;
-        }
-
         // ============ DOWNLOAD ============
-        function showDownloadModal() {
-            document.getElementById('downloadModal').style.display = 'flex';
-        }
-
-        function closeDownloadModal() {
-            document.getElementById('downloadModal').style.display = 'none';
+        async function captureResumePages() {
+            const pages = document.querySelectorAll('.resume-page');
+            const canvases = [];
+            
+            for (const page of pages) {
+                const origTransform = page.style.transform;
+                page.style.transform = 'scale(1)';
+                const canvas = await html2canvas(page, { 
+                    scale: 3, 
+                    useCORS: true, 
+                    logging: false, 
+                    backgroundColor: '#ffffff' 
+                });
+                canvases.push(canvas);
+                page.style.transform = origTransform;
+            }
+            
+            return canvases;
         }
 
         async function downloadPDF() {
             closeDownloadModal();
             showToast('Generating PDF...', 'info');
-            const page = document.getElementById('resumePage');
-            const orig = page.style.transform;
-            page.style.transform = 'scale(1)';
             
             try {
-                const canvas = await html2canvas(page, { scale: 3, useCORS: true, logging: false, backgroundColor: '#ffffff' });
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const canvases = await captureResumePages();
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                const w = 210, h = (canvas.height * w) / canvas.width;
-                pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+                
+                for (let i = 0; i < canvases.length; i++) {
+                    if (i > 0) pdf.addPage();
+                    const imgData = canvases[i].toDataURL('image/jpeg', 1.0);
+                    const w = 210, h = (canvases[i].height * w) / canvases[i].width;
+                    pdf.addImage(imgData, 'JPEG', 0, 0, w, Math.min(h, 297));
+                }
+                
                 pdf.save(`${(resumeData.personal.fullName||'resume').replace(/\s+/g,'_')}_CV.pdf`);
                 showToast('PDF downloaded!', 'success');
             } catch(e) {
                 showToast('Error generating PDF', 'error');
             }
-            page.style.transform = orig;
         }
 
-        async function downloadPNG() {
-            closeDownloadModal();
-            showToast('Generating PNG...', 'info');
-            const page = document.getElementById('resumePage');
-            const orig = page.style.transform;
-            page.style.transform = 'scale(1)';
+        async function downloadImage(type) {
+            const canvases = await captureResumePages();
+            // Download first page as image
+            const ext = type === 'png' ? 'png' : 'jpg';
+            const mime = type === 'png' ? 'image/png' : 'image/jpeg';
+            const quality = type === 'png' ? 1.0 : 0.95;
             
-            try {
-                const canvas = await html2canvas(page, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
-                const a = document.createElement('a');
-                a.download = `${(resumeData.personal.fullName||'resume').replace(/\s+/g,'_')}_CV.png`;
-                a.href = canvas.toDataURL('image/png');
-                a.click();
-                showToast('PNG downloaded!', 'success');
-            } catch(e) {
-                showToast('Error generating PNG', 'error');
-            }
-            page.style.transform = orig;
+            const a = document.createElement('a');
+            a.download = `${(resumeData.personal.fullName||'resume').replace(/\s+/g,'_')}_CV.${ext}`;
+            a.href = canvases[0].toDataURL(mime, quality);
+            a.click();
+            showToast(`${type.toUpperCase()} downloaded!`, 'success');
         }
 
-        async function downloadJPEG() {
-            closeDownloadModal();
-            showToast('Generating JPEG...', 'info');
-            const page = document.getElementById('resumePage');
-            const orig = page.style.transform;
-            page.style.transform = 'scale(1)';
-            
-            try {
-                const canvas = await html2canvas(page, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
-                const a = document.createElement('a');
-                a.download = `${(resumeData.personal.fullName||'resume').replace(/\s+/g,'_')}_CV.jpg`;
-                a.href = canvas.toDataURL('image/jpeg', 0.95);
-                a.click();
-                showToast('JPEG downloaded!', 'success');
-            } catch(e) {
-                showToast('Error generating JPEG', 'error');
-            }
-            page.style.transform = orig;
-        }
+        function downloadPNG() { closeDownloadModal(); downloadImage('png'); }
+        function downloadJPEG() { closeDownloadModal(); downloadImage('jpeg'); }
 
         function downloadTXT() {
             closeDownloadModal();
@@ -1837,6 +2016,7 @@
             if (d.personal.altPhone) t += `Alt Phone: ${d.personal.altPhone}\n`;
             if (d.personal.city) t += `Location: ${d.personal.city}\n`;
             if (d.summary.careerObjective) t += `\nSUMMARY\n${'-'.repeat(30)}\n${d.summary.careerObjective}\n`;
+            
             if (d.experience.some(e=>e.company||e.title)) {
                 t += `\nEXPERIENCE\n${'-'.repeat(30)}\n`;
                 d.experience.forEach(e => { if(e.company||e.title) t += `\n${e.title||''} - ${e.company||''}\n${e.startDate||''} - ${e.endDate||'Present'}\n${e.description||''}\n`; });
@@ -1845,8 +2025,7 @@
                 t += `\nEDUCATION\n${'-'.repeat(30)}\n`;
                 d.education.forEach(e => { if(e.school||e.degree) t += `\n${e.degree||''} - ${e.school||''} (${e.graduationYear||''})\n`; });
             }
-            if (d.skills.languages) t += `\nSKILLS\n${'-'.repeat(30)}\nLanguages: ${d.skills.languages}\n`;
-            if (d.skills.tools) t += `Tools: ${d.skills.tools}\n`;
+            if (d.skills.languages) t += `\nSKILLS\n${'-'.repeat(30)}\nLanguages: ${d.skills.languages}\nTools: ${d.skills.tools}\n`;
             
             const blob = new Blob([t], { type: 'text/plain' });
             const a = document.createElement('a');
@@ -1863,6 +2042,18 @@
             panel.classList.toggle('mobile-open');
             overlay.classList.toggle('show');
         }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const closeBtn = document.getElementById('closeEditorBtn');
+            if (window.innerWidth <= 1024) {
+                if (closeBtn) closeBtn.style.display = 'flex';
+            } else {
+                if (closeBtn) closeBtn.style.display = 'none';
+                document.getElementById('editorPanel').classList.remove('mobile-open');
+                document.getElementById('mobileOverlay').classList.remove('show');
+            }
+        });
 
         // ============ TOAST ============
         function showToast(message, type = 'info') {
