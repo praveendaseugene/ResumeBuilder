@@ -30,10 +30,15 @@ No installation needed - just open and start building your resume!
 ## 📸 Screenshots
 
 ### Resume Builder Interface
-![Resume Builder](screenshots/builder.png) *(Add your screenshot here)*
+<img width="395" height="181" alt="image" src="https://github.com/user-attachments/assets/7bd98466-b60b-475d-81ca-04b2e822d5b3" />
+
+
 
 ### Template Options
-![Templates](screenshots/templates.png) *(Add your screenshot here)*
+<img width="394" height="175" alt="image" src="https://github.com/user-attachments/assets/2ba77a7e-e99d-4623-bb97-5cb3591f44d3" />
+
+
+
 
 ## 🛠️ Installation
 
